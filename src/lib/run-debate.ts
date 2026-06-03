@@ -1,10 +1,18 @@
-import OpenAI from "openai";
-import type {
-  ChatCompletionMessageParam,
-  ChatCompletionTool,
-} from "openai/resources/chat/completions/completions.js";
+import { Effect } from "effect";
+import { streamText, tool } from "ai";
+import { createGateway } from "@ai-sdk/gateway";
+import { z } from "zod";
 import { webSearch } from "./search.ts";
-import type { DebateResult } from "./debate.ts";
+import type { DebateConfig, DebateResult } from "./debate.ts";
+import type { ModelMessage } from "ai";
+
+export class DebateError extends Error {
+  readonly _tag = "DebateError";
+  constructor(message: string) {
+    super(message);
+    this.name = "DebateError";
+  }
+}
 
 export interface DebateCallbacks {
   onStatus?: (status: string) => void;
@@ -18,49 +26,50 @@ export interface DebateCallbacks {
   onJudgeResult?: (winner: string, reasoning: string) => void;
 }
 
-const MODEL = "openrouter/owl-alpha";
+const webSearchTool = tool({
+  description: "Search the web for current information relevant to the debate",
+  inputSchema: z.object({
+    query: z.string().describe("The search query"),
+  }),
+  execute: async ({ query }) => {
+    try {
+      return await Effect.runPromise(webSearch(query));
+    } catch (e) {
+      return `Search failed: ${e instanceof Error ? e.message : String(e)}`;
+    }
+  },
+});
 
-function makeTool(): ChatCompletionTool {
-  return {
-    type: "function",
-    function: {
-      name: "web_search",
-      description: "Search the web for current information relevant to the debate",
-      parameters: {
-        type: "object",
-        properties: {
-          query: { type: "string", description: "The search query" },
-        },
-        required: ["query"],
-      },
-    },
-  };
-}
+type DebateSide = "pro" | "con";
 
 async function speak(
-  openai: OpenAI,
-  sideMessages: ChatCompletionMessageParam[],
-  opponentHistory: ChatCompletionMessageParam[],
-  side: "pro" | "con",
+  config: DebateConfig,
+  sideMessages: ModelMessage[],
+  opponentHistory: ModelMessage[],
+  side: DebateSide,
   round: number,
   totalRounds: number,
-  minSearches: number,
-  topic: string,
   onText?: (text: string) => void,
   onSearch?: (query: string) => void,
 ): Promise<string> {
-  const messages: ChatCompletionMessageParam[] = [...sideMessages];
+  const modelId =
+    side === "pro" ? (config.proModel ?? config.model) : (config.conModel ?? config.model);
+  const gateway = createGateway({ apiKey: config.apiKey });
+  const lm = gateway.languageModel(modelId);
+  const messages: ModelMessage[] = [...sideMessages];
 
-  const lastOpponentMsg = [...opponentHistory].reverse().find(
-    (m): m is ChatCompletionMessageParam & { role: "assistant"; content: string } =>
-      m.role === "assistant" && typeof m.content === "string",
-  );
+  const lastOpponentMsg = [...opponentHistory]
+    .reverse()
+    .find(
+      (m): m is ModelMessage & { role: "assistant"; content: string } =>
+        m.role === "assistant" && typeof m.content === "string",
+    );
 
   if (!lastOpponentMsg || (round === 1 && side === "pro")) {
     const forOrAgainst = side === "pro" ? "TRUE" : "FALSE";
     messages.push({
       role: "user",
-      content: `The proposition is: "${topic}". Argue that this proposition is ${forOrAgainst}. Begin by searching for evidence to support your case.`,
+      content: `The proposition is: "${config.topic}". Argue that this proposition is ${forOrAgainst}. Begin by searching for evidence to support your case.`,
     });
   } else {
     const proOrAgainst = side === "pro" ? "FOR" : "AGAINST";
@@ -70,192 +79,152 @@ async function speak(
     });
   }
 
-  const tool = makeTool();
+  const tools = { web_search: webSearchTool };
   let searchCount = 0;
   let fullContent = "";
-  let supportsRequired = true;
 
   while (true) {
-    const needSearches = searchCount < minSearches;
+    const needSearches = searchCount < config.minSearches;
+    const toolChoice: "required" | "auto" = needSearches ? "required" : "auto";
 
-    let toolChoice: "required" | "auto" = needSearches && supportsRequired ? "required" : "auto";
-
-    let stream;
+    let streamResult;
     try {
-      stream = await openai.chat.completions.create({
-        model: MODEL,
-        messages,
-        stream: true,
-        tools: [tool],
-        tool_choice: toolChoice,
-      });
+      streamResult = streamText({ model: lm, messages, tools, toolChoice });
     } catch (e) {
-      if (toolChoice === "required" && e instanceof Error && (e.message.includes("tool_choice") || e.message.includes("No endpoints"))) {
-        supportsRequired = false;
-        toolChoice = "auto";
-        stream = await openai.chat.completions.create({
-          model: MODEL,
-          messages,
-          stream: true,
-          tools: [tool],
-          tool_choice: toolChoice,
-        });
-      } else {
-        throw e;
-      }
+      throw new DebateError(
+        `Failed to start stream: ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
 
-    const toolCallAccumulators: Record<number, { id: string; name: string; args: string }> = {};
     let content = "";
-    let finished = false;
+    let stepFinished = false;
 
-    for await (const chunk of stream) {
-      const choice = chunk.choices[0];
-      if (!choice) continue;
-      const delta = choice.delta;
-      const finishReason = choice.finish_reason;
-
-      if (delta?.content) {
-        content += delta.content;
-        onText?.(delta.content);
-      }
-
-      if (delta?.tool_calls) {
-        for (const tc of delta.tool_calls) {
-          const idx = tc.index ?? 0;
-          if (!toolCallAccumulators[idx]) {
-            toolCallAccumulators[idx] = { id: tc.id ?? "", name: tc.function?.name ?? "", args: tc.function?.arguments ?? "" };
-          } else {
-            if (tc.id) toolCallAccumulators[idx]!.id += tc.id;
-            if (tc.function?.name) toolCallAccumulators[idx]!.name += tc.function.name;
-            if (tc.function?.arguments) toolCallAccumulators[idx]!.args += tc.function.arguments;
-          }
-        }
-      }
-
-      if (finishReason === "tool_calls") {
-        const toolCalls = Object.values(toolCallAccumulators).map((tc) => ({
-          id: tc.id,
-          type: "function" as const,
-          function: { name: tc.name, arguments: tc.args },
-        }));
-
-        messages.push({
-          role: "assistant",
-          content: content || null,
-          tool_calls: toolCalls,
-        } as ChatCompletionMessageParam);
-
-        for (const tc of Object.values(toolCallAccumulators)) {
-          searchCount++;
-          let result: string;
-          try {
-            const parsed = JSON.parse(tc.args) as { query?: string };
-            const query = parsed.query ?? tc.args;
-            onSearch?.(query);
-            result = await webSearch(query);
-          } catch (e: unknown) {
-            result = `Search error: ${e instanceof Error ? e.message : String(e)}`;
-          }
-          messages.push({
-            role: "tool",
-            tool_call_id: tc.id,
-            content: result,
-          } as ChatCompletionMessageParam);
-        }
-
-        finished = false;
-        break;
-      }
-
-      if (finishReason === "stop" || finishReason === "length") {
-        if (searchCount < minSearches) {
-          if (content) {
-            messages.push({
-              role: "assistant",
-              content,
-            } as ChatCompletionMessageParam);
-            messages.push({
-              role: "user",
-              content: "You haven't searched enough yet. Use the web_search tool to find evidence before continuing.",
-            } as ChatCompletionMessageParam);
-          }
+    for await (const part of streamResult.fullStream) {
+      switch (part.type) {
+        case "text-delta":
+          content += part.text;
+          onText?.(part.text);
           break;
-        }
-        fullContent += content;
-        if (content && !content.endsWith("\n")) fullContent += "\n";
-        finished = true;
-        break;
+        case "tool-result":
+          searchCount++;
+          onSearch?.((part.input as { query: string }).query);
+          break;
+        case "finish-step":
+          stepFinished = true;
+          break;
       }
     }
 
-    if (finished) break;
+    const response = await streamResult.response;
+    const responseMessages = response.messages;
+    if (responseMessages && responseMessages.length > 0) {
+      messages.length = 0;
+      messages.push(...(responseMessages as unknown as ModelMessage[]));
+    }
+
+    if (stepFinished && searchCount < config.minSearches) {
+      messages.push({
+        role: "user",
+        content:
+          "You haven't searched enough yet. Use the web_search tool to find evidence before continuing.",
+      });
+      if (content) {
+        fullContent += content;
+        if (!content.endsWith("\n")) fullContent += "\n";
+      }
+      continue;
+    }
+
+    if (content) {
+      fullContent += content;
+      if (!content.endsWith("\n")) fullContent += "\n";
+    }
+    break;
   }
 
   return fullContent;
 }
 
 async function generateFeedback(
-  openai: OpenAI,
-  forSide: "pro" | "con",
+  config: DebateConfig,
+  forSide: DebateSide,
   allRounds: string[],
   onFeedback?: (text: string) => void,
 ): Promise<string> {
+  const modelId = config.judgeModel ?? config.model;
+  const gateway = createGateway({ apiKey: config.apiKey });
+  const lm = gateway.languageModel(modelId);
   const targetSide = forSide === "pro" ? "NEG" : "PRO";
-  const systemMsg: ChatCompletionMessageParam = {
-    role: "system",
-    content:
-      "You are a helpful debate coach. Provide constructive, specific feedback focused on argumentation, evidence use, and persuasion. Do not use any tools.",
-  };
-  const userMsg: ChatCompletionMessageParam = {
-    role: "user",
-      content: `Review the ${targetSide} debater's arguments below and provide constructive feedback on how they could improve. Be specific about argumentation, evidence use, and persuasion.\n\n${targetSide}'s arguments:\n${allRounds.join("\n\n")}`,
-  };
 
-  const stream = await openai.chat.completions.create({
-    model: MODEL,
-    messages: [systemMsg, userMsg],
-    stream: true,
-  });
+  let streamResult;
+  try {
+    streamResult = streamText({
+      model: lm,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a helpful debate coach. Provide constructive, specific feedback focused on argumentation, evidence use, and persuasion. Do not use any tools.",
+        },
+        {
+          role: "user",
+          content: `Review the ${targetSide} debater's arguments below and provide constructive feedback on how they could improve. Be specific about argumentation, evidence use, and persuasion.\n\n${targetSide}'s arguments:\n${allRounds.join("\n\n")}`,
+        },
+      ],
+    });
+  } catch (e) {
+    throw new DebateError(
+      `Failed to start feedback: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 
   let content = "";
-  for await (const chunk of stream) {
-    const text = chunk.choices[0]?.delta?.content ?? "";
-    content += text;
-    onFeedback?.(text);
+  for await (const part of streamResult.fullStream) {
+    if (part.type === "text-delta") {
+      content += part.text;
+      onFeedback?.(part.text);
+    }
   }
 
   return content;
 }
 
 async function judge(
-  openai: OpenAI,
-  topic: string,
+  config: DebateConfig,
   proRounds: string[],
   conRounds: string[],
   onJudgeResult?: (winner: string, reasoning: string) => void,
 ): Promise<{ winner: string; reasoning: string }> {
-  const systemMsg: ChatCompletionMessageParam = {
-    role: "system",
-    content:
-      "You are an impartial debate judge. Evaluate the debate based on evidence, logic, persuasiveness, and rebuttals. Pick a clear winner and provide detailed reasoning.",
-  };
-  const userMsg: ChatCompletionMessageParam = {
-    role: "user",
-    content: `Debate topic: "${topic}"\n\nPRO arguments:\n${proRounds.join("\n\n")}\n\nNEG arguments:\n${conRounds.join("\n\n")}\n\nWho won this debate? Start your response with "PRO" or "NEG" on the first line, followed by your detailed reasoning.`,
-  };
+  const modelId = config.judgeModel ?? config.model;
+  const gateway = createGateway({ apiKey: config.apiKey });
+  const lm = gateway.languageModel(modelId);
 
-  const stream = await openai.chat.completions.create({
-    model: MODEL,
-    messages: [systemMsg, userMsg],
-    stream: true,
-  });
+  let streamResult;
+  try {
+    streamResult = streamText({
+      model: lm,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an impartial debate judge. Evaluate the debate based on evidence, logic, persuasiveness, and rebuttals. Pick a clear winner and provide detailed reasoning.",
+        },
+        {
+          role: "user",
+          content: `Debate topic: "${config.topic}"\n\nPRO arguments:\n${proRounds.join("\n\n")}\n\nNEG arguments:\n${conRounds.join("\n\n")}\n\nWho won this debate? Start your response with "PRO" or "NEG" on the first line, followed by your detailed reasoning.`,
+        },
+      ],
+    });
+  } catch (e) {
+    throw new DebateError(`Failed to start judge: ${e instanceof Error ? e.message : String(e)}`);
+  }
 
   let content = "";
-  for await (const chunk of stream) {
-    const text = chunk.choices[0]?.delta?.content ?? "";
-    content += text;
-    onJudgeResult?.("", text);
+  for await (const part of streamResult.fullStream) {
+    if (part.type === "text-delta") {
+      content += part.text;
+      onJudgeResult?.("", part.text);
+    }
   }
 
   const firstLine = content.split("\n")[0] ?? "";
@@ -264,46 +233,54 @@ async function judge(
   return { winner, reasoning: content };
 }
 
-export async function runDebate(
-  topic: string,
-  rounds: number,
-  minSearches: number,
-  openai: OpenAI,
+async function runDebateInternal(
+  config: DebateConfig,
   callbacks?: DebateCallbacks,
 ): Promise<DebateResult> {
-  const proSystem: ChatCompletionMessageParam = {
+  const proSystem: ModelMessage = {
     role: "system",
-    content: `You are arguing FOR the proposition: "${topic}". Defend it with evidence, logic, and persuasive arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(minSearches, 1)} time(s). Do not mention being an AI or language model.`,
+    content: `You are arguing FOR the proposition: "${config.topic}". Defend it with evidence, logic, and persuasive arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(config.minSearches, 1)} time(s). Do not mention being an AI or language model.`,
   };
-  const conSystem: ChatCompletionMessageParam = {
+  const conSystem: ModelMessage = {
     role: "system",
-    content: `You are arguing AGAINST the proposition: "${topic}". Refute it with evidence, logic, and persuasive counter-arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(minSearches, 1)} time(s). Do not mention being an AI or language model.`,
+    content: `You are arguing AGAINST the proposition: "${config.topic}". Refute it with evidence, logic, and persuasive counter-arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(config.minSearches, 1)} time(s). Do not mention being an AI or language model.`,
   };
 
-  const proHistory: ChatCompletionMessageParam[] = [proSystem];
-  const conHistory: ChatCompletionMessageParam[] = [conSystem];
-
+  const proHistory: ModelMessage[] = [proSystem];
+  const conHistory: ModelMessage[] = [conSystem];
   const proRounds: string[] = [];
   const conRounds: string[] = [];
 
   callbacks?.onStatus?.("Debate starting...");
 
-  for (let round = 1; round <= rounds; round++) {
-    callbacks?.onRound?.(round, rounds);
-    callbacks?.onStatus?.(`Round ${round}/${rounds} - PRO speaking`);
+  for (let round = 1; round <= config.rounds; round++) {
+    callbacks?.onRound?.(round, config.rounds);
+    callbacks?.onStatus?.(`Round ${round}/${config.rounds} - PRO speaking`);
 
     const proResult = await speak(
-      openai, proHistory, conHistory, "pro", round, rounds, minSearches, topic,
-      callbacks?.onProText, callbacks?.onProSearch,
+      config,
+      proHistory,
+      conHistory,
+      "pro",
+      round,
+      config.rounds,
+      callbacks?.onProText,
+      callbacks?.onProSearch,
     );
     proRounds.push(proResult);
     proHistory.push({ role: "assistant", content: proResult });
 
-    if (round < rounds) {
-    callbacks?.onStatus?.(`Round ${round}/${rounds} - NEG speaking`);
+    if (round < config.rounds) {
+      callbacks?.onStatus?.(`Round ${round}/${config.rounds} - NEG speaking`);
       const conResult = await speak(
-        openai, conHistory, proHistory, "con", round, rounds, minSearches, topic,
-        callbacks?.onConText, callbacks?.onConSearch,
+        config,
+        conHistory,
+        proHistory,
+        "con",
+        round,
+        config.rounds,
+        callbacks?.onConText,
+        callbacks?.onConSearch,
       );
       conRounds.push(conResult);
       conHistory.push({ role: "assistant", content: conResult });
@@ -312,19 +289,30 @@ export async function runDebate(
 
   callbacks?.onStatus?.("Evaluating...");
   const [proFeedback, conFeedback, judgeResult] = await Promise.all([
-    generateFeedback(openai, "pro", conRounds, callbacks?.onProFeedback),
-    generateFeedback(openai, "con", proRounds, callbacks?.onConFeedback),
-    judge(openai, topic, proRounds, conRounds, callbacks?.onJudgeResult),
+    generateFeedback(config, "pro", conRounds, callbacks?.onProFeedback),
+    generateFeedback(config, "con", proRounds, callbacks?.onConFeedback),
+    judge(config, proRounds, conRounds, callbacks?.onJudgeResult),
   ]);
 
   callbacks?.onStatus?.("◆ Debate concluded");
   return {
-    topic,
-    rounds,
+    topic: config.topic,
+    rounds: config.rounds,
     proRounds,
     conRounds,
     proFeedback,
     conFeedback,
     judgeResult,
   };
+}
+
+export function runDebate(
+  config: DebateConfig,
+  callbacks?: DebateCallbacks,
+): Effect.Effect<DebateResult, DebateError> {
+  return Effect.tryPromise({
+    try: async () => runDebateInternal(config, callbacks),
+    catch: (e) =>
+      e instanceof DebateError ? e : new DebateError(e instanceof Error ? e.message : String(e)),
+  });
 }

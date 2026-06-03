@@ -1,7 +1,13 @@
-export interface ToolCallLog {
-  id: string;
-  name: string;
-  args: string;
+export interface DebateConfig {
+  topic: string;
+  rounds: number;
+  minSearches: number;
+  apiKey: string;
+  model: string;
+  proModel?: string;
+  conModel?: string;
+  judgeModel?: string;
+  searxngUrl?: string;
 }
 
 export interface DebateResult {

@@ -11,7 +11,7 @@ export function writeMarkdown(result: DebateResult, outputPath?: string): string
   const dateStr = `${y}-${mo}-${d}`;
   const timeStr = `${h}:${mi}:${s}`;
 
-  const path = outputPath ?? `debate-${y}-${mo}-${d}-${h}${mi}${s}.md`;
+  const path = outputPath ?? `debatable-${y}-${mo}-${d}-${h}${mi}${s}.md`;
 
   const lines: string[] = [];
   lines.push(`# Debate: "${result.topic}"`);
@@ -66,6 +66,6 @@ export function writeMarkdown(result: DebateResult, outputPath?: string): string
   lines.push("");
 
   const content = lines.join("\n");
-  Bun.write(path, content);
+  void Bun.write(path, content);
   return path;
 }
