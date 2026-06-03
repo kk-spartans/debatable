@@ -75,7 +75,7 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
   const [proFeedback, setProFeedback] = useState("");
   const [conFeedback, setConFeedback] = useState("");
   const [judgeResult, setJudgeResult] = useState<{ winner: string; reasoning: string } | null>(null);
-  const [selectedRound, setSelectedRound] = useState(0);
+
 
   const syntaxStyle = useMemo(() => SyntaxStyle.create(), []);
 
@@ -131,14 +131,6 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
           }
           return;
         }
-
-        if (key.name >= "1" && key.name <= "9") {
-          const n = parseInt(key.name);
-          setSelectedRound((prev) => prev === n ? 0 : n);
-        }
-        if (key.name === "0") {
-          setSelectedRound(0);
-        }
       },
       [renderer],
     ),
@@ -156,7 +148,6 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
     setProFeedback("");
     setConFeedback("");
     setJudgeResult(null);
-    setSelectedRound(0);
     currentRoundIdx.current = -1;
     shownSearchesPro.current = new Set();
     shownSearchesCon.current = new Set();
@@ -245,14 +236,10 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
     const accent = side === "pro" ? PRO_BLUE : CON_RED;
     const name = side === "pro" ? "PRO" : "NEG";
 
-    const filtered = selectedRound > 0
-      ? rounds.filter((_, i) => i + 1 === selectedRound)
-      : rounds;
+    if (rounds.length === 0) return <text fg={MUTED}>Waiting...</text>;
 
-    if (filtered.length === 0) return <text fg={MUTED}>Waiting...</text>;
-
-    return filtered.map((segs, ri) => {
-      const roundNum = selectedRound > 0 ? selectedRound : ri + 1;
+    return rounds.map((segs, ri) => {
+      const roundNum = ri + 1;
 
       return (
         <box key={ri} flexDirection="column">
@@ -337,9 +324,9 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
       )}
 
       {phase !== "setup" && (
-        <box flexDirection="row" flexGrow={1}>
+        <box flexDirection="row" flexGrow={1} overflow="hidden">
           <scrollbox
-            key={`pro-${selectedRound}`}
+            key="pro"
             borderStyle="rounded"
             borderColor={PRO_BLUE}
             title={`PRO: That ${topic}`}
@@ -347,18 +334,19 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
             stickyScroll
             stickyStart="bottom"
             scrollY
-            padding={2}
+            paddingX={2}
+            paddingTop={1}
           >
             {renderSegments(proRounds, "pro")}
             {proFeedback && (
-              <box flexDirection="column" padding={1} backgroundColor={SURFACE1}>
+              <box flexDirection="column" padding={1}>
                 <text>{"\n"}</text>
                 <markdown syntaxStyle={syntaxStyle} fg={TEXT} content={proFeedback} streaming={false} />
               </box>
             )}
           </scrollbox>
           <scrollbox
-            key={`con-${selectedRound}`}
+            key="con"
             borderStyle="rounded"
             borderColor={CON_RED}
             title={`NEG: Not that ${topic}`}
@@ -366,24 +354,17 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
             stickyScroll
             stickyStart="bottom"
             scrollY
-            padding={2}
+            paddingX={2}
+            paddingTop={1}
           >
             {renderSegments(conRounds, "con")}
             {conFeedback && (
-              <box flexDirection="column" padding={1} backgroundColor={SURFACE1}>
+              <box flexDirection="column" padding={1}>
                 <text>{"\n"}</text>
                 <markdown syntaxStyle={syntaxStyle} fg={TEXT} content={conFeedback} streaming={false} />
               </box>
             )}
           </scrollbox>
-        </box>
-      )}
-
-      {status && (
-        <box borderStyle="rounded" borderColor={MUTED} paddingX={1}>
-          <text fg={MUTED}>
-            {status}
-          </text>
         </box>
       )}
 
@@ -399,7 +380,7 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
         >
           <box
             borderStyle="double"
-            borderColor={judgeResult.winner === "PRO" ? PRO_BLUE : CON_RED}
+            borderColor={PINK}
             backgroundColor={SURFACE0}
             padding={2}
             width={76}
@@ -413,9 +394,8 @@ export function App({ initialTopic, initialRounds, initialMinSearches }: AppProp
                 Winner: <span fg={judgeResult.winner === "PRO" ? PRO_BLUE : CON_RED}>{judgeResult.winner}</span>
               </text>
             </box>
-              <scrollbox backgroundColor={SURFACE0} scrollY stickyScroll stickyStart="bottom" flexGrow={1} padding={1}>
+              <scrollbox backgroundColor={SURFACE0} scrollY stickyScroll stickyStart="bottom" flexGrow={1} paddingX={1} paddingTop={1}>
                 <markdown syntaxStyle={syntaxStyle} fg={TEXT} content={judgeResult.reasoning} streaming={false} />
-                <text>{"\n"}</text>
               </scrollbox>
             <box marginTop={1}>
               <text fg={SUBTEXT}>Press ESC to exit</text>

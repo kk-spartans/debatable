@@ -310,14 +310,12 @@ export async function runDebate(
     }
   }
 
-  callbacks?.onStatus?.("PRO writing constructive feedback...");
-  const proFeedback = await generateFeedback(openai, "pro", conRounds, callbacks?.onProFeedback);
-
-   callbacks?.onStatus?.("NEG writing constructive feedback...");
-  const conFeedback = await generateFeedback(openai, "con", proRounds, callbacks?.onConFeedback);
-
-  callbacks?.onStatus?.("Judge evaluating...");
-  const judgeResult = await judge(openai, topic, proRounds, conRounds, callbacks?.onJudgeResult);
+  callbacks?.onStatus?.("Evaluating...");
+  const [proFeedback, conFeedback, judgeResult] = await Promise.all([
+    generateFeedback(openai, "pro", conRounds, callbacks?.onProFeedback),
+    generateFeedback(openai, "con", proRounds, callbacks?.onConFeedback),
+    judge(openai, topic, proRounds, conRounds, callbacks?.onJudgeResult),
+  ]);
 
   callbacks?.onStatus?.("◆ Debate concluded");
   return {
