@@ -23,7 +23,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@ai-sdk/gateway": "^3.0.123",
+    "@ai-sdk/gateway": "^3.0.124",
     "@e18e/cli": "^0.7.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
@@ -31,8 +31,8 @@
     "@semantic-release/npm": "^13.1.5",
     "@types/bun": "latest",
     "@types/react": "^19.2.16",
-    "ai": "^6.0.195",
-    "effect": "^4.0.0-beta.76",
+    "ai": "^6.0.196",
+    "effect": "^4.0.0-beta.78",
     "knip": "^6.15.0",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
