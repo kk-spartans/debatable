@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/kk-spartans/debatable/compare/v1.0.1...v1.0.2) (2026-06-09)
+
+
+### Bug Fixes
+
+* **package:** add repository.url for sigstore provenance validation ([82acd66](https://github.com/kk-spartans/debatable/commit/82acd66b69bea907cb3bef5ed47cf8f87a667ff2))
+
 ## [1.0.1](https://github.com/kk-spartans/debatable/compare/v1.0.0...v1.0.1) (2026-06-09)
 
 
