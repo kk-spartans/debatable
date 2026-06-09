@@ -29,7 +29,7 @@ jobs:
 
       - name: Semantic Release
         id: semantic
-        run: devenv shell bun run release
+        run: devenv tasks run debatable:release
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
