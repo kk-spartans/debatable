@@ -1,6 +1,6 @@
 {
   "name": "debatable",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI debate simulator - two LLM instances argue PRO and NEG on a topic",
   "license": "Unlicense",
   "bin": {
