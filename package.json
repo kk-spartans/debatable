@@ -3,6 +3,10 @@
   "version": "1.0.1",
   "description": "AI debate simulator - two LLM instances argue PRO and NEG on a topic",
   "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kk-spartans/debatable"
+  },
   "bin": {
     "debatable": "dist/debatable"
   },
