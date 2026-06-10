@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/kk-spartans/debatable/compare/v1.1.0...v1.1.1) (2026-06-10)
+
+
+### Bug Fixes
+
+* **ci:** run oxfmt on CHANGELOG.md && swallow react-doctor --score exit code ([6ac671f](https://github.com/kk-spartans/debatable/commit/6ac671fe1bb1b1caa2d085dbcda920e3fe8b7a89))
+
 # [1.1.0](https://github.com/kk-spartans/debatable/compare/v1.0.2...v1.1.0) (2026-06-10)
 
 
