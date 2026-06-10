@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/kk-spartans/debatable/compare/v1.1.4...v1.1.5) (2026-06-10)
+
+
+### Bug Fixes
+
+* **release:** run oxfmt --write on CHANGELOG.md before git commit via @semantic-release/exec ([c8586d8](https://github.com/kk-spartans/debatable/commit/c8586d8c2baee89b74f1de08bcfb1bef09a0d110))
+
 ## [1.1.4](https://github.com/kk-spartans/debatable/compare/v1.1.3...v1.1.4) (2026-06-10)
 
 ### Bug Fixes
