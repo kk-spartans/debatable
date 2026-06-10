@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/kk-spartans/debatable/compare/v1.1.6...v1.1.7) (2026-06-10)
+
+
+### Bug Fixes
+
+* **ci:** format CHANGELOG.md with oxfmt ([0342457](https://github.com/kk-spartans/debatable/commit/0342457ccaf1a6b66fb26f99cfe04990ad3f9a86))
+
 ## [1.1.6](https://github.com/kk-spartans/debatable/compare/v1.1.5...v1.1.6) (2026-06-10)
 
 ### Bug Fixes
