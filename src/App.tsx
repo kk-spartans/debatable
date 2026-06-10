@@ -5,20 +5,14 @@ import { Effect } from "effect";
 import { runDebate } from "./lib/run-debate.ts";
 import { writeMarkdown } from "./lib/write-markdown.ts";
 import type { DebateResult, AppPhase } from "./lib/debate.ts";
-
-const TEXT = "#cdd6f4";
-const SUBTEXT = "#a6adc8";
-const SURFACE0 = "#313244";
-const PINK = "#f5c2e7";
-const PRO_BLUE = "#89b4fa";
-const CON_RED = "#f38ba8";
-const MUTED = "#6c7086";
+import type { Theme } from "./lib/theme.ts";
 
 interface AppProps {
   initialTopic?: string;
   initialRounds?: number;
   initialMinSearches?: number;
   initialModel?: string;
+  theme?: Theme;
 }
 
 let _segId = 0;
@@ -69,6 +63,7 @@ interface SetupFormProps {
   judgeModel: string;
   focusIndex: number;
   apiKey: string | undefined;
+  theme: Theme;
   onTopicChange: (v: string) => void;
   onRoundsChange: (v: string) => void;
   onMinSearchesChange: (v: string) => void;
@@ -89,6 +84,7 @@ function SetupForm({
   judgeModel,
   focusIndex,
   apiKey,
+  theme,
   onTopicChange,
   onRoundsChange,
   onMinSearchesChange,
@@ -102,7 +98,7 @@ function SetupForm({
     <box flexGrow={1} alignItems="center" justifyContent="center">
       <box
         borderStyle="rounded"
-        borderColor={PINK}
+        borderColor={theme.accent}
         padding={2}
         width={60}
         flexDirection="column"
@@ -180,11 +176,11 @@ function SetupForm({
           />
         </box>
         <box marginTop={1}>
-          <text fg={SUBTEXT}>Tab to navigate · Enter to start · ESC to quit</text>
+          <text fg={theme.subtext}>Tab to navigate · Enter to start · ESC to quit</text>
         </box>
         {!apiKey && (
           <box marginTop={1}>
-            <text fg={CON_RED}>Error: OPENROUTER_API_KEY not set</text>
+            <text fg={theme.con}>Error: OPENROUTER_API_KEY not set</text>
           </box>
         )}
       </box>
@@ -195,9 +191,10 @@ function SetupForm({
 interface JudgeResultModalProps {
   judgeResult: { winner: string; reasoning: string };
   syntaxStyle: SyntaxStyle;
+  theme: Theme;
 }
 
-function JudgeResultModal({ judgeResult, syntaxStyle }: JudgeResultModalProps) {
+function JudgeResultModal({ judgeResult, syntaxStyle, theme }: JudgeResultModalProps) {
   return (
     <box
       position="absolute"
@@ -210,8 +207,8 @@ function JudgeResultModal({ judgeResult, syntaxStyle }: JudgeResultModalProps) {
     >
       <box
         borderStyle="double"
-        borderColor={PINK}
-        backgroundColor={SURFACE0}
+        borderColor={theme.accent}
+        backgroundColor={theme.surface0}
         padding={2}
         width={76}
         maxHeight={18}
@@ -222,11 +219,13 @@ function JudgeResultModal({ judgeResult, syntaxStyle }: JudgeResultModalProps) {
         <box marginBottom={1}>
           <text>
             Winner:{" "}
-            <span fg={judgeResult.winner === "PRO" ? PRO_BLUE : CON_RED}>{judgeResult.winner}</span>
+            <span fg={judgeResult.winner === "PRO" ? theme.pro : theme.con}>
+              {judgeResult.winner}
+            </span>
           </text>
         </box>
         <scrollbox
-          backgroundColor={SURFACE0}
+          backgroundColor={theme.surface0}
           scrollY
           stickyScroll
           stickyStart="bottom"
@@ -236,13 +235,13 @@ function JudgeResultModal({ judgeResult, syntaxStyle }: JudgeResultModalProps) {
         >
           <markdown
             syntaxStyle={syntaxStyle}
-            fg={TEXT}
+            fg={theme.text}
             content={judgeResult.reasoning}
             streaming={false}
           />
         </scrollbox>
         <box marginTop={1}>
-          <text fg={SUBTEXT}>Press ESC to exit</text>
+          <text fg={theme.subtext}>Press ESC to exit</text>
         </box>
       </box>
     </box>
@@ -257,6 +256,7 @@ interface DebatePanelsProps {
   proFeedback: string;
   conFeedback: string;
   syntaxStyle: SyntaxStyle;
+  theme: Theme;
 }
 
 function DebatePanels({
@@ -267,13 +267,14 @@ function DebatePanels({
   proFeedback,
   conFeedback,
   syntaxStyle,
+  theme,
 }: DebatePanelsProps) {
   return (
     <box flexDirection="row" flexGrow={1} overflow="hidden">
       <scrollbox
         key="pro"
         borderStyle="rounded"
-        borderColor={PRO_BLUE}
+        borderColor={theme.pro}
         title={`PRO: That ${topic}`}
         flexGrow={1}
         stickyScroll
@@ -282,18 +283,29 @@ function DebatePanels({
         paddingX={2}
         paddingTop={1}
       >
-        <DebateRounds rounds={proRounds} side="pro" syntaxStyle={syntaxStyle} phase={phase} />
+        <DebateRounds
+          rounds={proRounds}
+          side="pro"
+          syntaxStyle={syntaxStyle}
+          phase={phase}
+          theme={theme}
+        />
         {proFeedback && (
           <box flexDirection="column" padding={1}>
             <text>{"\n"}</text>
-            <markdown syntaxStyle={syntaxStyle} fg={TEXT} content={proFeedback} streaming={false} />
+            <markdown
+              syntaxStyle={syntaxStyle}
+              fg={theme.text}
+              content={proFeedback}
+              streaming={false}
+            />
           </box>
         )}
       </scrollbox>
       <scrollbox
         key="con"
         borderStyle="rounded"
-        borderColor={CON_RED}
+        borderColor={theme.con}
         title={`NEG: Not that ${topic}`}
         flexGrow={1}
         stickyScroll
@@ -302,11 +314,22 @@ function DebatePanels({
         paddingX={2}
         paddingTop={1}
       >
-        <DebateRounds rounds={conRounds} side="con" syntaxStyle={syntaxStyle} phase={phase} />
+        <DebateRounds
+          rounds={conRounds}
+          side="con"
+          syntaxStyle={syntaxStyle}
+          phase={phase}
+          theme={theme}
+        />
         {conFeedback && (
           <box flexDirection="column" padding={1}>
             <text>{"\n"}</text>
-            <markdown syntaxStyle={syntaxStyle} fg={TEXT} content={conFeedback} streaming={false} />
+            <markdown
+              syntaxStyle={syntaxStyle}
+              fg={theme.text}
+              content={conFeedback}
+              streaming={false}
+            />
           </box>
         )}
       </scrollbox>
@@ -319,6 +342,7 @@ interface DebateRoundsProps {
   side: "pro" | "con";
   syntaxStyle: SyntaxStyle;
   phase: AppPhase;
+  theme: Theme;
 }
 
 let _roundId = 0;
@@ -326,11 +350,11 @@ function nextRoundId(): string {
   return `r-${++_roundId}`;
 }
 
-function DebateRounds({ rounds, side, syntaxStyle, phase }: DebateRoundsProps) {
-  const accent = side === "pro" ? PRO_BLUE : CON_RED;
+function DebateRounds({ rounds, side, syntaxStyle, phase, theme }: DebateRoundsProps) {
+  const accent = side === "pro" ? theme.pro : theme.con;
   const name = side === "pro" ? "PRO" : "NEG";
 
-  if (rounds.length === 0) return <text fg={MUTED}>Waiting&hellip;</text>;
+  if (rounds.length === 0) return <text fg={theme.muted}>Waiting&hellip;</text>;
 
   const roundElements: React.ReactNode[] = [];
   for (let ri = 0; ri < rounds.length; ri++) {
@@ -345,7 +369,7 @@ function DebateRounds({ rounds, side, syntaxStyle, phase }: DebateRoundsProps) {
         {segs.length > 0 ? (
           segs.map((seg) =>
             seg.t === "search" ? (
-              <text key={seg._id} fg={MUTED}>
+              <text key={seg._id} fg={theme.muted}>
                 Search: {seg.v}
                 <br />
               </text>
@@ -362,7 +386,7 @@ function DebateRounds({ rounds, side, syntaxStyle, phase }: DebateRoundsProps) {
             ),
           )
         ) : (
-          <text fg={MUTED}>Waiting&hellip;</text>
+          <text fg={theme.muted}>Waiting&hellip;</text>
         )}
       </box>,
     );
@@ -370,7 +394,16 @@ function DebateRounds({ rounds, side, syntaxStyle, phase }: DebateRoundsProps) {
   return roundElements;
 }
 
-export function App({ initialTopic, initialModel }: AppProps) {
+export function App({ initialTopic, initialModel, theme: _theme }: AppProps) {
+  const theme = _theme ?? {
+    accent: "#f5c2e7",
+    pro: "#89b4fa",
+    con: "#f38ba8",
+    text: "#cdd6f4",
+    subtext: "#a6adc8",
+    surface0: "#313244",
+    muted: "#6c7086",
+  };
   const renderer = useRenderer();
 
   const [phase, setPhase] = useState<AppPhase>(initialTopic ? "debating" : "setup");
@@ -585,6 +618,7 @@ export function App({ initialTopic, initialModel }: AppProps) {
           judgeModel={judgeModel}
           focusIndex={focusIndex}
           apiKey={apiKey}
+          theme={theme}
           onTopicChange={setTopic}
           onRoundsChange={setRoundsStr}
           onMinSearchesChange={setMinSearchesStr}
@@ -605,11 +639,12 @@ export function App({ initialTopic, initialModel }: AppProps) {
           proFeedback={proFeedback}
           conFeedback={conFeedback}
           syntaxStyle={syntaxStyle}
+          theme={theme}
         />
       )}
 
       {phase === "done" && judgeResult && (
-        <JudgeResultModal judgeResult={judgeResult} syntaxStyle={syntaxStyle} />
+        <JudgeResultModal judgeResult={judgeResult} syntaxStyle={syntaxStyle} theme={theme} />
       )}
     </box>
   );

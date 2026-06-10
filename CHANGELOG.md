@@ -7,10 +7,9 @@
 
 ## [1.0.1](https://github.com/kk-spartans/debatable/compare/v1.0.0...v1.0.1) (2026-06-09)
 
-
 ### Bug Fixes
 
-* **release:** run semantic-release directly via devenv shell for OIDC token passthrough ([6f6d86b](https://github.com/kk-spartans/debatable/commit/6f6d86bb84264034a3c8d82e06af2a93afc78ae3))
+- **release:** run semantic-release directly via devenv shell for OIDC token passthrough ([6f6d86b](https://github.com/kk-spartans/debatable/commit/6f6d86bb84264034a3c8d82e06af2a93afc78ae3))
 
 # 1.0.0 (2026-06-09)
 

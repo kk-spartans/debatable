@@ -5,6 +5,7 @@ import { createRoot } from "@opentui/react";
 import { runDebate } from "./lib/run-debate.ts";
 import { writeMarkdown } from "./lib/write-markdown.ts";
 import { setSearxngUrl } from "./lib/search.ts";
+import { readTheme } from "./lib/config.ts";
 import type { DebateConfig } from "./lib/debate.ts";
 
 const args = process.argv.slice(2);
@@ -189,6 +190,7 @@ if (config.headless) {
       initialRounds={config.rounds}
       initialMinSearches={config.minSearches}
       initialModel={config.model || undefined}
+      theme={readTheme()}
     />,
   );
 }
