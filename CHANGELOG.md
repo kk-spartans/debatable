@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/kk-spartans/debatable/compare/v1.0.2...v1.1.0) (2026-06-10)
+
+
+### Features
+
+* nix flake, home-manager module, JSON theme config ([613b14d](https://github.com/kk-spartans/debatable/commit/613b14d1b84add6b1268dfccba80d2cc5905ccf9))
+
 ## [1.0.2](https://github.com/kk-spartans/debatable/compare/v1.0.1...v1.0.2) (2026-06-09)
 
 
