@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/kk-spartans/debatable/compare/v1.1.3...v1.1.4) (2026-06-10)
+
+
+### Bug Fixes
+
+* **ci:** use oxfmt --write instead of --check to auto-fix formatting ([5f9a93a](https://github.com/kk-spartans/debatable/commit/5f9a93a3cbde258e8253d9eb6259f1a57162f5b3))
+
 ## [1.1.3](https://github.com/kk-spartans/debatable/compare/v1.1.2...v1.1.3) (2026-06-10)
 
 
