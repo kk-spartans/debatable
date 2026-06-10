@@ -16,8 +16,8 @@
   "type": "module",
   "scripts": {
     "start": "bun --watch run src/index.tsx",
-    "check": "bun build --compile --outfile dist/debatable src/index.tsx && oxlint --type-aware --type-check --fix && oxfmt --write && knip && e18e-cli analyze --log-level error && bunx react-doctor --score",
-    "ci": "S=$?; bun build --compile --outfile dist/debatable src/index.tsx && oxlint --type-aware --type-check && oxfmt --check && knip && e18e-cli analyze --log-level error || S=$?; react-doctor --score || true; exit $S",
+    "check": "bun run scripts/check.ts",
+    "ci": "bun run scripts/ci.ts",
     "release": "semantic-release"
   },
   "dependencies": {
