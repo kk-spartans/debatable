@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/kk-spartans/debatable/compare/v1.1.5...v1.1.6) (2026-06-10)
+
+
+### Bug Fixes
+
+* **ci:** auto-format CHANGELOG.md with oxfmt ([1902c0c](https://github.com/kk-spartans/debatable/commit/1902c0cb27781d3db20bac48d08398ae81f1a4bc))
+
 ## [1.1.5](https://github.com/kk-spartans/debatable/compare/v1.1.4...v1.1.5) (2026-06-10)
 
 ### Bug Fixes
