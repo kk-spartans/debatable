@@ -7,10 +7,9 @@
 
 ## [1.1.2](https://github.com/kk-spartans/debatable/compare/v1.1.1...v1.1.2) (2026-06-10)
 
-
 ### Bug Fixes
 
-* **ci:** format CHANGELOG.md ([2f717cd](https://github.com/kk-spartans/debatable/commit/2f717cdb7ea5b9a56c47d755d9b51142da920e59))
+- **ci:** format CHANGELOG.md ([2f717cd](https://github.com/kk-spartans/debatable/commit/2f717cdb7ea5b9a56c47d755d9b51142da920e59))
 
 ## [1.1.1](https://github.com/kk-spartans/debatable/compare/v1.1.0...v1.1.1) (2026-06-10)
 
