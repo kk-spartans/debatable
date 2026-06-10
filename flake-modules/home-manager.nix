@@ -1,9 +1,27 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.programs.debatable;
-  inherit (lib) mkIf mkEnableOption mkOption types;
-in {
+  inherit (lib)
+    mkIf
+    mkEnableOption
+    mkOption
+    types
+    ;
+
+  hasCompletionIntegration =
+    cfg.enableBashIntegration
+    || cfg.enableZshIntegration
+    || cfg.enableFishIntegration
+    || cfg.enableNushellIntegration
+    || cfg.enablePowerShellIntegration;
+in
+{
   options.programs.debatable = {
     enable = mkEnableOption "debatable - AI debate simulator";
 
@@ -55,36 +73,66 @@ in {
                 };
               };
             };
-            default = {};
+            default = { };
             description = "Theme configuration (catppuccin mocha defaults)";
           };
         };
       };
-      default = {};
+      default = { };
       description = "Debatable settings (theme, etc.)";
     };
 
     enableZshIntegration = mkOption {
       type = types.bool;
       default = config.programs.zsh.enable or false;
-      description = "Enable zsh integration";
+      description = "Enable zsh integration (completions)";
     };
 
     enableBashIntegration = mkOption {
       type = types.bool;
       default = config.programs.bash.enable or false;
-      description = "Enable bash integration";
+      description = "Enable bash integration (completions)";
     };
 
     enableFishIntegration = mkOption {
       type = types.bool;
       default = config.programs.fish.enable or false;
-      description = "Enable fish integration";
+      description = "Enable fish integration (completions)";
+    };
+
+    enableNushellIntegration = mkOption {
+      type = types.bool;
+      default = config.programs.nushell.enable or false;
+      description = "Enable nushell integration (completions)";
+    };
+
+    enablePowerShellIntegration = mkOption {
+      type = types.bool;
+      default = config.programs.powershell.enable or false;
+      description = "Enable powershell integration (completions)";
+    };
+
+    enableIonIntegration = mkOption {
+      type = types.bool;
+      default = config.programs.ion.enable or false;
+      description = "Enable ion integration";
+    };
+
+    enableXonshIntegration = mkOption {
+      type = types.bool;
+      default = config.programs.xonsh.enable or false;
+      description = "Enable xonsh integration";
+    };
+
+    enableElvishIntegration = mkOption {
+      type = types.bool;
+      default = config.programs.elvish.enable or false;
+      description = "Enable elvish integration";
     };
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ cfg.package ];
+    home.packages = [ cfg.package ] ++ lib.optionals hasCompletionIntegration [ pkgs.usage ];
 
     xdg.configFile."debatable/config.json" = {
       text = builtins.toJSON {
@@ -100,28 +148,26 @@ in {
       };
     };
 
+    xdg.dataFile."bash-completion/completions/debatable" = mkIf cfg.enableBashIntegration {
+      source = "${cfg.package}/share/bash-completion/completions/debatable";
+    };
+
     programs.zsh = mkIf cfg.enableZshIntegration {
-      initExtra = ''
-        if command -v debatable &>/dev/null; then
-          eval "$(debatable --completions zsh)"
-        fi
-      '';
+      initExtraBeforeComp = "fpath+=${cfg.package}/share/zsh/site-functions";
     };
 
-    programs.bash = mkIf cfg.enableBashIntegration {
-      initExtra = ''
-        if command -v debatable &>/dev/null; then
-          eval "$(debatable --completions bash)"
-        fi
-      '';
+    xdg.configFile."fish/completions/debatable.fish" = mkIf cfg.enableFishIntegration {
+      source = "${cfg.package}/share/fish/vendor_completions.d/debatable.fish";
     };
 
-    programs.fish = mkIf cfg.enableFishIntegration {
-      interactiveShellInit = ''
-        if command -v debatable &>/dev/null
-          debatable --completions fish | source
-        end
-      '';
+    programs.nushell = mkIf cfg.enableNushellIntegration {
+      extraConfig = "source ${cfg.package}/share/nushell/completions/debatable.nu";
+    };
+
+    programs.powershell = mkIf cfg.enablePowerShellIntegration {
+      extraConfig = [
+        ". '${cfg.package}/share/powershell/completions/debatable.ps1'"
+      ];
     };
   };
 }

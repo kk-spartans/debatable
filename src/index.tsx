@@ -27,7 +27,7 @@ Options:
   --searxng-url <url>      Base URL for SearXNG instance (default: http://localhost:8080)
   -o, --output <path>      Output markdown file path
   --headless               Run in headless mode (no TUI)
-  --completions <shell>    Print shell completions (bash, zsh, fish, powershell, elvish, nushell)
+  --completions <shell>    Print shell completions (bash, zsh, fish, powershell, nushell)
   -h, --help               Show this help message and exit
 
 Headless mode requires both a topic and an API key (--api-key or OPENROUTER_API_KEY).
@@ -51,18 +51,18 @@ if (completionsFlag !== -1) {
   const shell = args[completionsFlag + 1];
   if (!shell) {
     console.error(
-      "Error: --completions requires a shell argument (bash, zsh, fish, powershell, elvish, nushell)",
+      "Error: --completions requires a shell argument (bash, zsh, fish, powershell, nushell)",
     );
     process.exit(1);
   }
   const { generateCompletions } = await import("./lib/completions.ts");
-  const output = generateCompletions(shell);
+  const output = await generateCompletions(shell);
   if (output) {
     console.log(output);
     process.exit(0);
   } else {
     console.error(
-      `Error: unsupported shell "${shell}". Supported: bash, zsh, fish, powershell, elvish, nushell`,
+      `Error: unsupported shell "${shell}". Supported: bash, zsh, fish, powershell, nushell`,
     );
     process.exit(1);
   }
