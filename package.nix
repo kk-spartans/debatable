@@ -7,6 +7,28 @@
 
 let
   pkg = builtins.fromJSON (builtins.readFile ./package.json);
+
+  bunDepsHash = lib.trim (builtins.readFile ./bun-deps-hash.nix);
+
+  bunDeps = stdenv.mkDerivation {
+    name = "${pkg.name}-bun-deps-${pkg.version}";
+    src = lib.sourceByRegex ./. [ "^package\\.json$" "^bun\\.lock$" ];
+    nativeBuildInputs = [ bun ];
+    dontFixup = true;
+    dontPatchShebangs = true;
+    dontStrip = true;
+    buildPhase = ''
+      export HOME=$TMPDIR
+      bun install --frozen-lockfile --no-verify
+    '';
+    installPhase = ''
+      mkdir -p $out/node_modules
+      cp -r node_modules/* node_modules/.* $out/node_modules/ 2>/dev/null || true
+    '';
+    outputHashMode = "recursive";
+    outputHashAlgo = "sha256";
+    outputHash = bunDepsHash;
+  };
 in
 stdenv.mkDerivation {
   inherit (pkg) name version;
@@ -40,7 +62,7 @@ stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
     export HOME=$TMPDIR
-    bun install --frozen-lockfile --no-verify
+    ln -sf ${bunDeps}/node_modules node_modules
     bun build --compile --outfile dist/debatable src/index.tsx
     runHook postBuild
   '';

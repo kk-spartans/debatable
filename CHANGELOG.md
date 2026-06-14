@@ -7,10 +7,9 @@
 
 ## [1.2.3](https://github.com/kk-spartans/debatable/compare/v1.2.2...v1.2.3) (2026-06-14)
 
-
 ### Bug Fixes
 
-* **release:** zip artifacts as debatable-{platform}-{arch}.zip with single binary inside ([0116781](https://github.com/kk-spartans/debatable/commit/011678144238fbefac9dbf28906dfc8e5376831c))
+- **release:** zip artifacts as debatable-{platform}-{arch}.zip with single binary inside ([0116781](https://github.com/kk-spartans/debatable/commit/011678144238fbefac9dbf28906dfc8e5376831c))
 
 ## [1.2.2](https://github.com/kk-spartans/debatable/compare/v1.2.1...v1.2.2) (2026-06-14)
 

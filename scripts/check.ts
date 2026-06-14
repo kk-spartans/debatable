@@ -2,6 +2,9 @@ import { $ } from "bun";
 
 const steps = [
   async () => {
+    await $`bun run scripts/update-bun-deps-hash.ts`;
+  },
+  async () => {
     await $`bun build --compile --outfile dist/debatable src/index.tsx`;
   },
   async () => {
