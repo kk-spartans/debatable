@@ -19,11 +19,16 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
+      - uses: cachix/install-nix-action@v31
+
       - name: Update dependencies
         run: |
           git config user.name "debatable-bot"
           git config user.email "bot@debatable.local"
           bun update
+
+      - name: Update Nix flake inputs
+        run: nix flake update
 
       - name: Commit and push
         run: |
