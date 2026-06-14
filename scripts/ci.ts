@@ -33,15 +33,20 @@ const checkSteps = [
   },
 ];
 
+const log = (msg: string) => {
+  console.log(msg);
+  void Bun.write(Bun.stderr, msg + "\n");
+};
+
 let buildFailed = false;
 
 for (const [i, step] of buildSteps.entries()) {
   try {
-    console.log(`[ci] build step ${i}...`);
+    log(`[ci] build step ${i} starting`);
     await step();
-    console.log(`[ci] build step ${i} ok`);
-  } catch (e) {
-    console.log(`[ci] build step ${i} FAILED:`, e);
+    log(`[ci] build step ${i} ok`);
+  } catch {
+    log(`[ci] build step ${i} FAILED`);
     buildFailed = true;
   }
 }
@@ -50,14 +55,16 @@ let checkFailed = false;
 
 for (const [i, step] of checkSteps.entries()) {
   try {
-    console.log(`[ci] check step ${i}...`);
+    log(`[ci] check step ${i} starting`);
     await step();
-    console.log(`[ci] check step ${i} ok`);
-  } catch (e) {
-    console.log(`[ci] check step ${i} FAILED:`, e);
+    log(`[ci] check step ${i} ok`);
+  } catch {
+    log(`[ci] check step ${i} FAILED`);
     checkFailed = true;
   }
 }
+
+log(`[ci] buildFailed=${buildFailed} checkFailed=${checkFailed}`);
 
 try {
   await $`react-doctor --score`;
