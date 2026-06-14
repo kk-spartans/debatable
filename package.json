@@ -1,6 +1,6 @@
 {
   "name": "debatable",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "AI debate simulator - two LLM instances argue PRO and NEG on a topic",
   "license": "Unlicense",
   "repository": {

@@ -1,3 +1,10 @@
+## [1.2.7](https://github.com/kk-spartans/debatable/compare/v1.2.6...v1.2.7) (2026-06-14)
+
+
+### Bug Fixes
+
+* fmt CHANGELOG.md for CI format check ([9d3b645](https://github.com/kk-spartans/debatable/commit/9d3b6454e564e7af75f91e79fa57ef1d9fbb99c1))
+
 ## [1.2.6](https://github.com/kk-spartans/debatable/compare/v1.2.5...v1.2.6) (2026-06-14)
 
 
