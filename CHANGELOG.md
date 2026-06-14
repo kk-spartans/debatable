@@ -1,9 +1,8 @@
 ## [1.2.14](https://github.com/kk-spartans/debatable/compare/v1.2.13...v1.2.14) (2026-06-14)
 
-
 ### Bug Fixes
 
-* **ci:** replace devenv with direct bun setup, fix nix build SSL certs ([b822ff7](https://github.com/kk-spartans/debatable/commit/b822ff7a642b0fffa1286aafae8bfc0092a9f8b3))
+- **ci:** replace devenv with direct bun setup, fix nix build SSL certs ([b822ff7](https://github.com/kk-spartans/debatable/commit/b822ff7a642b0fffa1286aafae8bfc0092a9f8b3))
 
 ## [1.2.13](https://github.com/kk-spartans/debatable/compare/v1.2.12...v1.2.13) (2026-06-14)
 
