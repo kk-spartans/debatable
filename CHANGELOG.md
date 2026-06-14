@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/kk-spartans/debatable/compare/v1.2.3...v1.2.4) (2026-06-14)
+
+
+### Bug Fixes
+
+* replace unused catch params with bare catch blocks ([e8e2b4e](https://github.com/kk-spartans/debatable/commit/e8e2b4e9e0f5771e98705549ab7dc396b9c2d531))
+
 ## [1.2.3](https://github.com/kk-spartans/debatable/compare/v1.2.2...v1.2.3) (2026-06-14)
 
 
