@@ -58,13 +58,20 @@ jobs:
           TAG="v${{ steps.check.outputs.version }}"
           echo "Building release artifacts for $TAG"
 
-          bun build --compile --outfile debatable-linux-x64 --target bun-linux-x64 src/index.tsx
-          bun build --compile --outfile debatable-linux-arm64 --target bun-linux-arm64 src/index.tsx
-          bun build --compile --outfile debatable-darwin-x64 --target bun-darwin-x64 src/index.tsx
-          bun build --compile --outfile debatable-darwin-arm64 --target bun-darwin-arm64 src/index.tsx
-          bun build --compile --outfile debatable-windows-x64.exe --target bun-windows-x64 src/index.tsx
-          bun build --compile --outfile debatable-windows-arm64.exe --target bun-windows-arm64 src/index.tsx
+          mkdir -p artifacts
 
-          gh release upload "$TAG" debatable-* --clobber
+          for plat in linux-x64 linux-arm64 darwin-x64 darwin-arm64; do
+            bun build --compile --outfile "artifacts/debatable" --target "bun-$plat" src/index.tsx
+            (cd artifacts && zip -r "../debatable-$plat.zip" debatable)
+            rm artifacts/debatable
+          done
+
+          for plat in windows-x64 windows-arm64; do
+            bun build --compile --outfile "artifacts/debatable.exe" --target "bun-$plat" src/index.tsx
+            (cd artifacts && zip -r "../debatable-$plat.zip" debatable.exe)
+            rm artifacts/debatable.exe
+          done
+
+          gh release upload "$TAG" debatable-*.zip --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
