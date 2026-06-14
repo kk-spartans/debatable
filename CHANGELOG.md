@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/kk-spartans/debatable/compare/v1.2.0...v1.2.1) (2026-06-14)
+
+
+### Bug Fixes
+
+* **release:** bun doesn't support `unknown-linux` ([3fd26cd](https://github.com/kk-spartans/debatable/commit/3fd26cd4dce887bfbaac3744cdb18c9c5a884598))
+
 # [1.2.0](https://github.com/kk-spartans/debatable/compare/v1.1.7...v1.2.0) (2026-06-14)
 
 
