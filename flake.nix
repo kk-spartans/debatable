@@ -58,21 +58,6 @@
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
-      nixosModules.default =
-        {
-          lib,
-          pkgs,
-          ...
-        }:
-        let
-          system = pkgs.stdenv.hostPlatform.system;
-        in
-        {
-          imports = [ ./flake-modules/nixos.nix ];
-
-          config.programs.debatable.package = lib.mkDefault self.packages.${system}.default;
-        };
-
       homeManagerModules.default =
         {
           config,

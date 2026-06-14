@@ -153,7 +153,7 @@ in
     };
 
     programs.zsh = mkIf cfg.enableZshIntegration {
-      initExtraBeforeComp = "fpath+=${cfg.package}/share/zsh/site-functions";
+      initExtra = "fpath+=${cfg.package}/share/zsh/site-functions";
     };
 
     xdg.configFile."fish/completions/debatable.fish" = mkIf cfg.enableFishIntegration {
@@ -164,10 +164,8 @@ in
       extraConfig = "source ${cfg.package}/share/nushell/completions/debatable.nu";
     };
 
-    programs.powershell = mkIf cfg.enablePowerShellIntegration {
-      extraConfig = [
-        ". '${cfg.package}/share/powershell/completions/debatable.ps1'"
-      ];
+    xdg.configFile."powershell/debatable-completions.ps1" = mkIf cfg.enablePowerShellIntegration {
+      text = ". '${cfg.package}/share/powershell/completions/debatable.ps1'";
     };
   };
 }
