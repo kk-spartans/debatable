@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/kk-spartans/debatable/compare/v1.2.8...v1.2.9) (2026-06-14)
+
+
+### Bug Fixes
+
+* **devshell:** devshell fails to run with global config ([885ba69](https://github.com/kk-spartans/debatable/commit/885ba69666590e18355c0b570feafe6a7d37719c))
+
 ## [1.2.8](https://github.com/kk-spartans/debatable/compare/v1.2.7...v1.2.8) (2026-06-14)
 
 ### Bug Fixes
