@@ -1,3 +1,10 @@
+## [1.2.10](https://github.com/kk-spartans/debatable/compare/v1.2.9...v1.2.10) (2026-06-14)
+
+
+### Bug Fixes
+
+* **home-manager:** programs.debatable doesn't exist ([76e4608](https://github.com/kk-spartans/debatable/commit/76e4608782e2d4cd6b639af403e14cd669bc16f2))
+
 ## [1.2.9](https://github.com/kk-spartans/debatable/compare/v1.2.8...v1.2.9) (2026-06-14)
 
 
