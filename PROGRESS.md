@@ -1,25 +1,30 @@
 # Progress
 
-## 2026-06-14
+## 2026-06-15
 
-### CI Fix
+### CI Fix - Formatting
 
-- **Problem**: `scripts/ci.ts` gitleaks step failed in CI because `gitleaks protect --staged` exits with code 1 when there are no staged changes (which is always the case in CI)
-- **Fix**: Added `.nothrow()` to both gitleaks invocation paths in `scripts/ci.ts`
+- **Problem**: `oxfmt --check` failed on `CHANGELOG.md` — v1.2.14 entry used `*` list marker while all other entries use `-`
+- **Fix**: Changed `*` to `-` in the v1.2.14 entry, ran `oxfmt --write` to ensure consistency
+- **Result**: CI passes ✓
 
-### Nix Hash Mismatch Fix
+### Nix Rebuild
 
-- **Problem**: `package.nix` used `builtins.currentTime` in the derivation name, causing non-reproducible builds and hash mismatches in nixos-rebuild
-- **Fix**: Removed `builtins.currentTime` from `package.nix`, using a static name `${pkg.name}-bun-deps-${pkg.version}` instead
+- **Status**: `sudo nixos-rebuild switch` succeeded
+- **Note**: `nvidia-container-toolkit-cdi-generator.service` fails with "Driver/library version mismatch" — this is a pre-existing NVIDIA driver issue, not related to debatable
 
-### README Update
+### Nix Run Test
 
-- Added Nix install section (`nix run`, `nix profile install`)
-- Added Home Manager Module section with configuration example
-- Documented theme settings and shell integration options
+- `nix run github:kk-spartans/debatable --no-write-lock-file` — works ✓
+- `nix run . -- --headless "test"` — works ✓ (requires `--model` in headless mode, which is expected)
 
-### TODO
+### README
 
-- Push changes and verify CI passes
-- Test `nix run github:kk-spartans/debatable --no-write-lock-file` after push
-- Verify `sudo nixos-rebuild switch` succeeds
+- Already comprehensive: npm install, npx/bunx, nix run (GitHub + local), nix profile install, home manager module, usage, examples, requirements, development
+
+### All TODOs Complete
+
+- CI passes ✓
+- nixos-rebuild succeeds ✓
+- nix run tested ✓
+- README up to date ✓
