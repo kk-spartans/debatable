@@ -1,3 +1,10 @@
+## [1.2.11](https://github.com/kk-spartans/debatable/compare/v1.2.10...v1.2.11) (2026-06-14)
+
+
+### Bug Fixes
+
+* **nix:** programs.powershell doesn't exist ([9e4ae59](https://github.com/kk-spartans/debatable/commit/9e4ae59a6817fe4cff66ba386a689ed1ea54aa84))
+
 ## [1.2.10](https://github.com/kk-spartans/debatable/compare/v1.2.9...v1.2.10) (2026-06-14)
 
 
