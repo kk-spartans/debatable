@@ -34,6 +34,14 @@ Or install from the flake:
 nix profile install github:kk-spartans/debatable
 ```
 
+Or build from a local clone:
+
+```bash
+nix build .#default
+# or
+nix run . -- "Your debate topic" --headless
+```
+
 ### Home Manager Module
 
 This flake provides a home-manager module. Add it to your home-manager configuration:
@@ -71,36 +79,36 @@ This flake provides a home-manager module. Add it to your home-manager configura
 ## Usage
 
 ```
-debatable [options] <topic>
+Usage: debatable [options] [topic]
 
-Arguments:
-  topic                    Debate topic
+An AI debate between PRO and NEG on a given topic.
 
 Options:
+  topic                    Debate topic (required in headless mode)
   -r, --rounds <n>         Number of debate rounds (default: 3)
-  -m, --min-searches <n>   Minimum searches per round (default: 2)
-  -k, --api-key <key>      API key (passed directly)
-  --api-key-env <var>      Environment variable name containing the API key (default: OPENROUTER_API_KEY)
-  --model <model>          LLM model to use (default: openai/gpt-4o)
-  --pro-model <model>      Override model for PRO
-  --con-model <model>      Override model for NEG
-  --judge-model <model>    Override model for judge
-  -o, --output <path>      Output path for markdown report
+  -m, --min-searches <n>   Minimum searches per turn (default: 1)
+  -k, --api-key <key>      Set API key (overrides OPENROUTER_API_KEY)
+  --model <model>          Default model for all sides (e.g. openrouter/anthropic/claude-sonnet-4-20250514)
+  --pro-model <model>      Override model for the PRO side
+  --con-model <model>      Override model for the NEG side
+  --judge-model <model>    Override model for judging and feedback
+  --searxng-url <url>      Base URL for SearXNG instance (default: http://localhost:8080)
+  -o, --output <path>      Output markdown file path
   --headless               Run in headless mode (no TUI)
-  --completions <shell>    Generate shell completions (bash, zsh, fish, powershell, elvish, nushell)
-  -h, --help               Show help
+  --completions <shell>    Print shell completions (bash, zsh, fish, powershell, nushell)
+  -h, --help               Show this help message and exit
 ```
 
-Shell completions are generated via [usage](https://usage.jdx.dev) (available in the dev shell).
+Shell completions are generated via [usage](https://usage.jdx.dev).
 Supported shells: bash, zsh, fish, powershell, nushell.
 
 ### Examples
 
 ```bash
-debatable "Is AI a threat to humanity?"
-debatable -r 5 "Should we colonize Mars?"
-debatable --headless -o report.md "Is pineapple on pizza acceptable?"
-debatable --api-key-env ANTHROPIC_API_KEY "Will AI replace all jobs?" --headless
+debatable "Migration increases unemployment"
+debatable -r 2 "AI will replace most jobs" --headless
+debatable -k sk-or-v1-xxx "Universal Basic Income" -o debate.md --headless
+debatable --model openrouter/anthropic/claude-sonnet-4-20250514 "UBI" --headless
 debatable --completions bash > /etc/bash_completion.d/debatable
 ```
 
