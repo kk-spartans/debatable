@@ -7,10 +7,9 @@
 
 ## [1.2.12](https://github.com/kk-spartans/debatable/compare/v1.2.11...v1.2.12) (2026-06-14)
 
-
 ### Bug Fixes
 
-* **nix:** hash mismatch ([4ed6fd1](https://github.com/kk-spartans/debatable/commit/4ed6fd16537c68a1cf72e3bac6bc8c96cf37694b))
+- **nix:** hash mismatch ([4ed6fd1](https://github.com/kk-spartans/debatable/commit/4ed6fd16537c68a1cf72e3bac6bc8c96cf37694b))
 
 ## [1.2.11](https://github.com/kk-spartans/debatable/compare/v1.2.10...v1.2.11) (2026-06-14)
 

@@ -35,20 +35,26 @@ const checkSteps = [
 
 let buildFailed = false;
 
-for (const step of buildSteps) {
+for (const [i, step] of buildSteps.entries()) {
   try {
+    console.log(`[ci] build step ${i}...`);
     await step();
-  } catch {
+    console.log(`[ci] build step ${i} ok`);
+  } catch (e) {
+    console.log(`[ci] build step ${i} FAILED:`, e);
     buildFailed = true;
   }
 }
 
 let checkFailed = false;
 
-for (const step of checkSteps) {
+for (const [i, step] of checkSteps.entries()) {
   try {
+    console.log(`[ci] check step ${i}...`);
     await step();
-  } catch {
+    console.log(`[ci] check step ${i} ok`);
+  } catch (e) {
+    console.log(`[ci] check step ${i} FAILED:`, e);
     checkFailed = true;
   }
 }

@@ -15,6 +15,9 @@ let
     dontFixup = true;
     dontPatchShebangs = true;
     dontStrip = true;
+    outputHashAlgo = "sha256";
+    outputHashMode = "recursive";
+    outputHash = "sha256-c4ZCQWTVnrYWiayCjCWdfpXKX/XwLXCQuHhSsekowRc=";
     buildPhase = ''
       export HOME=$TMPDIR
       bun install --no-verify
