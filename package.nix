@@ -54,6 +54,9 @@ stdenv.mkDerivation {
       && !(baseName == "devenv.lock" || baseName == "flake.lock");
   };
 
+  dontStrip = true;
+  dontPatchELF = true;
+
   nativeBuildInputs = [
     bun
     usage
@@ -62,7 +65,7 @@ stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
     export HOME=$TMPDIR
-    ln -sf ${bunDeps}/node_modules node_modules
+    cp -r --no-preserve=mode ${bunDeps}/node_modules node_modules
     bun build --compile --outfile dist/debatable src/index.tsx
     runHook postBuild
   '';
