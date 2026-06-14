@@ -1,3 +1,10 @@
+## [1.2.13](https://github.com/kk-spartans/debatable/compare/v1.2.12...v1.2.13) (2026-06-14)
+
+
+### Bug Fixes
+
+* **ci:** gitleaks step fails in CI, fix nix hash mismatch ([1880801](https://github.com/kk-spartans/debatable/commit/1880801f9ee27c046357bff03d59775af276b200))
+
 ## [1.2.12](https://github.com/kk-spartans/debatable/compare/v1.2.11...v1.2.12) (2026-06-14)
 
 
