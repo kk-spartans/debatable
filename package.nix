@@ -3,6 +3,7 @@
   stdenv,
   bun,
   usage,
+  cacert,
 }:
 
 let
@@ -12,6 +13,7 @@ let
     name = "${pkg.name}-bun-deps-${pkg.version}";
     src = lib.sourceByRegex ./. [ "^package\\.json$" "^bun\\.lock$" ];
     nativeBuildInputs = [ bun ];
+    buildInputs = [ cacert ];
     dontFixup = true;
     dontPatchShebangs = true;
     dontStrip = true;
@@ -20,6 +22,7 @@ let
     outputHash = "sha256-c4ZCQWTVnrYWiayCjCWdfpXKX/XwLXCQuHhSsekowRc=";
     buildPhase = ''
       export HOME=$TMPDIR
+      export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
       bun install --no-verify
     '';
     installPhase = ''
