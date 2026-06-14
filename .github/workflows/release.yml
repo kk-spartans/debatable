@@ -32,21 +32,39 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and upload release artifacts
+      - name: Check for new release
+        id: check
         run: |
           TAG=$(git tag --list 'v*' --sort=-version:refname | head -1)
           PREV="${{ steps.pre.outputs.tag }}"
           if [ -z "$TAG" ] || [ "$TAG" = "$PREV" ]; then
-            echo "No new release published, skipping artifact build"
+            echo "No new release, skipping artifact build"
             exit 0
           fi
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Install platform native deps for all targets
+        if: steps.check.outputs.version != ''
+        run: |
+          bun install --frozen-lockfile --no-verify --cpu arm64 --os linux
+          bun install --frozen-lockfile --no-verify --cpu x64 --os darwin
+          bun install --frozen-lockfile --no-verify --cpu arm64 --os darwin
+          bun install --frozen-lockfile --no-verify --cpu x64 --os win32
+          bun install --frozen-lockfile --no-verify --cpu arm64 --os win32
+
+      - name: Build and upload release artifacts
+        if: steps.check.outputs.version != ''
+        run: |
+          TAG="v${{ steps.check.outputs.version }}"
           echo "Building release artifacts for $TAG"
+
           bun build --compile --outfile debatable-linux-x64 --target bun-linux-x64 src/index.tsx
           bun build --compile --outfile debatable-linux-arm64 --target bun-linux-arm64 src/index.tsx
           bun build --compile --outfile debatable-darwin-x64 --target bun-darwin-x64 src/index.tsx
           bun build --compile --outfile debatable-darwin-arm64 --target bun-darwin-arm64 src/index.tsx
           bun build --compile --outfile debatable-windows-x64.exe --target bun-windows-x64 src/index.tsx
           bun build --compile --outfile debatable-windows-arm64.exe --target bun-windows-arm64 src/index.tsx
+
           gh release upload "$TAG" debatable-* --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
