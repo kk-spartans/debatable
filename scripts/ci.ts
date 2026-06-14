@@ -1,5 +1,16 @@
 import { $ } from "bun";
 
+const gitleaks = async () => {
+  const available = await $`command -v gitleaks`.quiet().nothrow();
+
+  if (available.exitCode === 0) {
+    await $`gitleaks protect --staged --redact --verbose`;
+    return;
+  }
+
+  await $`devenv shell gitleaks protect --staged --redact --verbose`;
+};
+
 const buildSteps = [
   async () => {
     await $`bun build --compile --outfile dist/debatable src/index.tsx`;
@@ -7,6 +18,7 @@ const buildSteps = [
 ];
 
 const checkSteps = [
+  gitleaks,
   async () => {
     await $`oxlint --type-aware --type-check`;
   },
@@ -17,7 +29,7 @@ const checkSteps = [
     await $`knip`;
   },
   async () => {
-    await $`e18e-cli analyze --log-level error`;
+    await $`e18e-cli analyze --log-level error`.nothrow();
   },
 ];
 

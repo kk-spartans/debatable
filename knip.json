@@ -2,5 +2,6 @@
   "$schema": "https://knip.dev/schema.json",
   "entry": [],
   "project": ["src/**/*.{ts,tsx}"],
+  "ignoreBinaries": ["devenv", "gitleaks"],
   "ignoreDependencies": ["@semantic-release/github", "@semantic-release/npm"]
 }

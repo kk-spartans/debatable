@@ -10,6 +10,7 @@
   packages = with pkgs; [
     bun
     codespell
+    gitleaks
     usage
     nixfmt
   ];
