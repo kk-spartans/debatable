@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/kk-spartans/debatable/compare/v1.1.7...v1.2.0) (2026-06-14)
+
+
+### Bug Fixes
+
+* format CHANGELOG.md with oxfmt ([c8eb15d](https://github.com/kk-spartans/debatable/commit/c8eb15deda8a9895c4b90cdcd952e1b0ef33a166))
+* **nix:** dream2nix not pulling deps due to timeout ([c2207c3](https://github.com/kk-spartans/debatable/commit/c2207c3ad873ad072e525dca024b0fc44ff4c7dc))
+
+
+### Features
+
+* add aarch64-pc-windows-msvc to release artifacts matrix ([012854e](https://github.com/kk-spartans/debatable/commit/012854e81c1ae059cbcdb2d441d606c1a9f48625))
+
 ## [1.1.7](https://github.com/kk-spartans/debatable/compare/v1.1.6...v1.1.7) (2026-06-10)
 
 ### Bug Fixes
