@@ -3,10 +3,18 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      ...
+    }:
     let
       systems = [
         "aarch64-linux"
@@ -49,6 +57,21 @@
       );
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
+
+      nixosModules.default =
+        {
+          lib,
+          pkgs,
+          ...
+        }:
+        let
+          system = pkgs.stdenv.hostPlatform.system;
+        in
+        {
+          imports = [ ./flake-modules/nixos.nix ];
+
+          config.programs.debatable.package = lib.mkDefault self.packages.${system}.default;
+        };
 
       homeManagerModules.default =
         {
