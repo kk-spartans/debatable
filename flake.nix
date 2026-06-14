@@ -2,46 +2,37 @@
   description = "Debatable - AI debate simulator";
 
   inputs = {
-    dream2nix.url = "github:nix-community/dream2nix";
-    dream2nix.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
   outputs =
-    {
-      self,
-      dream2nix,
-      nixpkgs,
-    }:
+    { self, nixpkgs }:
     let
-      eachSystem = nixpkgs.lib.genAttrs [
+      systems = [
         "aarch64-linux"
         "x86_64-linux"
       ];
+      forAllSystems = f: nixpkgs.lib.genAttrs systems f;
     in
     {
-      packages = eachSystem (system: {
-        default = dream2nix.lib.evalModules {
-          packageSets.nixpkgs = nixpkgs.legacyPackages.${system};
-          modules = [
-            ./package.nix
-            {
-              paths.projectRoot = ./.;
-              paths.projectRootFile = "flake.nix";
-              paths.package = ./.;
-            }
-          ];
-        };
-      });
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.callPackage ./package.nix { };
+        }
+      );
 
-      apps = eachSystem (system: {
+      apps = forAllSystems (system: {
         default = {
           type = "app";
           program = "${self.packages.${system}.default}/bin/debatable";
         };
       });
 
-      devShells = eachSystem (
+      devShells = forAllSystems (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
@@ -57,7 +48,7 @@
         }
       );
 
-      formatter = eachSystem (system: nixpkgs.legacyPackages.${system}.nixfmt);
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
       homeManagerModules.default =
         {
