@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/kk-spartans/debatable/compare/v1.2.5...v1.2.6) (2026-06-14)
+
+
+### Bug Fixes
+
+* nix-built binary shows bun help instead of debatable ([1508637](https://github.com/kk-spartans/debatable/commit/1508637d934e5eca68d3af900b0a1cb0632269bd))
+
 ## [1.2.5](https://github.com/kk-spartans/debatable/compare/v1.2.4...v1.2.5) (2026-06-14)
 
 
