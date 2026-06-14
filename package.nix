@@ -8,10 +8,10 @@
 let
   pkg = builtins.fromJSON (builtins.readFile ./package.json);
 
-  bunDepsHash = lib.trim (builtins.readFile ./bun-deps-hash.nix);
+  today = builtins.substring 0 10 (builtins.toString builtins.currentTime);
 
   bunDeps = stdenv.mkDerivation {
-    name = "${pkg.name}-bun-deps-${pkg.version}";
+    name = "${pkg.name}-bun-deps-${pkg.version}-${today}";
     src = lib.sourceByRegex ./. [ "^package\\.json$" "^bun\\.lock$" ];
     nativeBuildInputs = [ bun ];
     dontFixup = true;
@@ -19,15 +19,12 @@ let
     dontStrip = true;
     buildPhase = ''
       export HOME=$TMPDIR
-      bun install --frozen-lockfile --no-verify
+      bun install --no-verify
     '';
     installPhase = ''
       mkdir -p $out/node_modules
       cp -r node_modules/* node_modules/.* $out/node_modules/ 2>/dev/null || true
     '';
-    outputHashMode = "recursive";
-    outputHashAlgo = "sha256";
-    outputHash = bunDepsHash;
   };
 in
 stdenv.mkDerivation {
