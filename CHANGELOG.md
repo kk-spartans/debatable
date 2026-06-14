@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/kk-spartans/debatable/compare/v1.2.4...v1.2.5) (2026-06-14)
+
+
+### Bug Fixes
+
+* nix build by prefetching bun deps as fixed-output derivation ([dccf560](https://github.com/kk-spartans/debatable/commit/dccf5606dab3c1754d90d42715fee05c3a2e993b))
+
 ## [1.2.4](https://github.com/kk-spartans/debatable/compare/v1.2.3...v1.2.4) (2026-06-14)
 
 
