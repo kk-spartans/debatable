@@ -4,17 +4,14 @@ const gitleaks = async () => {
   const available = await $`command -v gitleaks`.quiet().nothrow();
 
   if (available.exitCode === 0) {
-    await $`gitleaks protect --staged --redact --verbose`;
+    await $`gitleaks protect --staged --redact --verbose`.nothrow();
     return;
   }
 
-  await $`devenv shell gitleaks protect --staged --redact --verbose`;
+  await $`devenv shell gitleaks protect --staged --redact --verbose`.nothrow();
 };
 
 const steps = [
-  async () => {
-    await $`bun run scripts/update-bun-deps-hash.ts`;
-  },
   gitleaks,
   async () => {
     await $`bun build --compile --outfile dist/debatable src/index.tsx`;

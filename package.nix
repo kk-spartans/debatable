@@ -8,10 +8,8 @@
 let
   pkg = builtins.fromJSON (builtins.readFile ./package.json);
 
-  today = builtins.substring 0 10 (builtins.toString builtins.currentTime);
-
   bunDeps = stdenv.mkDerivation {
-    name = "${pkg.name}-bun-deps-${pkg.version}-${today}";
+    name = "${pkg.name}-bun-deps-${pkg.version}";
     src = lib.sourceByRegex ./. [ "^package\\.json$" "^bun\\.lock$" ];
     nativeBuildInputs = [ bun ];
     dontFixup = true;

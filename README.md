@@ -19,6 +19,55 @@ npx debatable
 bunx debatable
 ```
 
+### Nix
+
+Run directly from GitHub:
+
+```bash
+nix run github:kk-spartans/debatable --no-write-lock-file
+nix run github:kk-spartans/debatable --no-write-lock-file "Is AI a threat to humanity?"
+```
+
+Or install from the flake:
+
+```bash
+nix profile install github:kk-spartans/debatable
+```
+
+### Home Manager Module
+
+This flake provides a home-manager module. Add it to your home-manager configuration:
+
+```nix
+# flake.nix
+{
+  inputs.debatable = {
+    url = "github:kk-spartans/debatable";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+}
+
+# home-manager module
+{ inputs, ... }: {
+  imports = [ inputs.debatable.homeManagerModules.default ];
+
+  programs.debatable = {
+    enable = true;
+    enableFishIntegration = true; # or bash, zsh, nushell, powershell
+
+    settings.theme = {
+      accent = "#f5c2e7";
+      pro = "#89b4fa";
+      con = "#f38ba8";
+      text = "#cdd6f4";
+      subtext = "#a6adc8";
+      surface0 = "#313244";
+      muted = "#6c7086";
+    };
+  };
+}
+```
+
 ## Usage
 
 ```
@@ -40,10 +89,10 @@ Options:
   --headless               Run in headless mode (no TUI)
   --completions <shell>    Generate shell completions (bash, zsh, fish, powershell, elvish, nushell)
   -h, --help               Show help
+```
 
 Shell completions are generated via [usage](https://usage.jdx.dev) (available in the dev shell).
 Supported shells: bash, zsh, fish, powershell, nushell.
-```
 
 ### Examples
 

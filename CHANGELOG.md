@@ -7,24 +7,21 @@
 
 ## [1.2.11](https://github.com/kk-spartans/debatable/compare/v1.2.10...v1.2.11) (2026-06-14)
 
-
 ### Bug Fixes
 
-* **nix:** programs.powershell doesn't exist ([9e4ae59](https://github.com/kk-spartans/debatable/commit/9e4ae59a6817fe4cff66ba386a689ed1ea54aa84))
+- **nix:** programs.powershell doesn't exist ([9e4ae59](https://github.com/kk-spartans/debatable/commit/9e4ae59a6817fe4cff66ba386a689ed1ea54aa84))
 
 ## [1.2.10](https://github.com/kk-spartans/debatable/compare/v1.2.9...v1.2.10) (2026-06-14)
 
-
 ### Bug Fixes
 
-* **home-manager:** programs.debatable doesn't exist ([76e4608](https://github.com/kk-spartans/debatable/commit/76e4608782e2d4cd6b639af403e14cd669bc16f2))
+- **home-manager:** programs.debatable doesn't exist ([76e4608](https://github.com/kk-spartans/debatable/commit/76e4608782e2d4cd6b639af403e14cd669bc16f2))
 
 ## [1.2.9](https://github.com/kk-spartans/debatable/compare/v1.2.8...v1.2.9) (2026-06-14)
 
-
 ### Bug Fixes
 
-* **devshell:** devshell fails to run with global config ([885ba69](https://github.com/kk-spartans/debatable/commit/885ba69666590e18355c0b570feafe6a7d37719c))
+- **devshell:** devshell fails to run with global config ([885ba69](https://github.com/kk-spartans/debatable/commit/885ba69666590e18355c0b570feafe6a7d37719c))
 
 ## [1.2.8](https://github.com/kk-spartans/debatable/compare/v1.2.7...v1.2.8) (2026-06-14)
 

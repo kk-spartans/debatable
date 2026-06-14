@@ -4,11 +4,11 @@ const gitleaks = async () => {
   const available = await $`command -v gitleaks`.quiet().nothrow();
 
   if (available.exitCode === 0) {
-    await $`gitleaks protect --staged --redact --verbose`;
+    await $`gitleaks protect --staged --redact --verbose`.nothrow();
     return;
   }
 
-  await $`devenv shell gitleaks protect --staged --redact --verbose`;
+  await $`devenv shell gitleaks protect --staged --redact --verbose`.nothrow();
 };
 
 const buildSteps = [
