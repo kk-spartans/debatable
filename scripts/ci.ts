@@ -26,7 +26,7 @@ let buildFailed = false;
 for (const step of buildSteps) {
   try {
     await step();
-  } catch (e) {
+  } catch {
     buildFailed = true;
   }
 }
@@ -36,14 +36,14 @@ let checkFailed = false;
 for (const step of checkSteps) {
   try {
     await step();
-  } catch (e) {
+  } catch {
     checkFailed = true;
   }
 }
 
 try {
   await $`react-doctor --score`;
-} catch (e) {
+} catch {
   // always allow this to fail
 }
 

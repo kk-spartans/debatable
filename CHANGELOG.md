@@ -7,10 +7,9 @@
 
 ## [1.2.2](https://github.com/kk-spartans/debatable/compare/v1.2.1...v1.2.2) (2026-06-14)
 
-
 ### Bug Fixes
 
-* **release:** install platform-specific native deps per target before cross-compilation ([161648f](https://github.com/kk-spartans/debatable/commit/161648f2d856f45f17a20afd5598d6b404b40429))
+- **release:** install platform-specific native deps per target before cross-compilation ([161648f](https://github.com/kk-spartans/debatable/commit/161648f2d856f45f17a20afd5598d6b404b40429))
 
 ## [1.2.1](https://github.com/kk-spartans/debatable/compare/v1.2.0...v1.2.1) (2026-06-14)
 

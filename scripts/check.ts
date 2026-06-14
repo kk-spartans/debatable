@@ -26,7 +26,7 @@ let failed = false;
 for (const step of steps) {
   try {
     await step();
-  } catch (e) {
+  } catch {
     failed = true;
   }
 }
