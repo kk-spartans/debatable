@@ -8,7 +8,7 @@ class SearchError extends Error {
   }
 }
 
-let searxngBaseUrl = "http://localhost:8080";
+let searxngBaseUrl = process.env.SEARXNG_BASE_URL?.replace(/\/+$/, "") || "http://localhost:8080";
 
 export function setSearxngUrl(url: string): void {
   searxngBaseUrl = url.replace(/\/+$/, "");

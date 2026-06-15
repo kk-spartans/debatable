@@ -24,7 +24,7 @@ Options:
   --pro-model <model>      Override model for the PRO side
   --con-model <model>      Override model for the NEG side
   --judge-model <model>    Override model for judging and feedback
-  --searxng-url <url>      Base URL for SearXNG instance (default: http://localhost:8080)
+  --searxng-url <url>      Base URL for SearXNG instance (default: $SEARXNG_BASE_URL or http://localhost:8080)
   -o, --output <path>      Output markdown file path
   --headless               Run in headless mode (no TUI)
   --completions <shell>    Print shell completions (bash, zsh, fish, powershell, nushell)

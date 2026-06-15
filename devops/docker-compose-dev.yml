@@ -1,0 +1,31 @@
+services:
+  searxng:
+    image: searxng/searxng:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+      - searxng-data:/etc/searxng
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+
+  debatable:
+    build:
+      context: ..
+      dockerfile: devops/Dockerfile
+    depends_on:
+      - searxng
+    env_file:
+      - ../.env
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080
+    stdin_open: true
+    tty: true
+
+volumes:
+  searxng-data:
