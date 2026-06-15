@@ -16,7 +16,7 @@
   "type": "module",
   "scripts": {
     "start": "bun --watch run src/index.tsx",
-    "release": "semantic-release --extends devops/semantic-release.json",
+    "release": "semantic-release --extends ./devops/semantic-release.json",
     "check": "bun run devops/check.ts"
   },
   "dependencies": {

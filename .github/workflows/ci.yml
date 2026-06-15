@@ -21,5 +21,5 @@ jobs:
 
       - name: run ci
         run: |
-          nix profile install nixpkgs#devenv
+          nix profile add nixpkgs#devenv
           devenv tasks run debatable:check
