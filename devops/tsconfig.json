@@ -7,7 +7,7 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "jsxImportSource": "@opentui/react",
-    "allowJs": true,
+    "allowJs": false,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
@@ -19,6 +19,6 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
-    "types": ["bun"]
+    "types": ["bun", "node"]
   }
 }

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://knip.dev/schema.json",
+  "entry": [],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignoreBinaries": ["gitleaks"],
+  "ignoreDependencies": [
+    "@semantic-release/changelog",
+    "@semantic-release/exec",
+    "@semantic-release/git",
+    "@semantic-release/github",
+    "@semantic-release/npm"
+  ]
+}

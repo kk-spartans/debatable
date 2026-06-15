@@ -19,16 +19,19 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: devenv
 
-      - run: bun install --frozen-lockfile --no-verify
+      - run: nix profile add nixpkgs#devenv
 
       - name: Save previous tag
         id: pre
         run: echo "tag=$(git tag --list 'v*' --sort=-version:refname | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Semantic Release
-        run: bun run release
+        run: devenv tasks run debatable:release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

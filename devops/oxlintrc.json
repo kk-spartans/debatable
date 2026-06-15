@@ -8,12 +8,11 @@
     "eqeqeq": "error",
     "no-console": "off",
     "no-unused-vars": "error",
-    "react/jsx-key": "error",
-    "react/no-unused-state": "error"
+    "react/jsx-key": "error"
   },
   "settings": {
     "react": {
-      "version": "detect"
+      "version": "19.2.7"
     }
   }
 }

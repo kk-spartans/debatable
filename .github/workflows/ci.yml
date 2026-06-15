@@ -13,10 +13,13 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
-      - uses: oven-sh/setup-bun@v2
+
       - uses: cachix/install-nix-action@v31
-      - name: Install gitleaks
-        run: nix profile install nixpkgs#gitleaks
-      - run: bun install --frozen-lockfile --no-verify
-      - name: Run ci
-        run: bun run ci
+      - uses: cachix/cachix-action@v16
+        with:
+          name: devenv
+
+      - name: run ci
+        run: |
+          nix profile install nixpkgs#devenv
+          devenv tasks run debatable:check

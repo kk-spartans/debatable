@@ -16,9 +16,8 @@
   "type": "module",
   "scripts": {
     "start": "bun --watch run src/index.tsx",
-    "check": "bun run scripts/check.ts",
-    "ci": "bun run scripts/ci.ts",
-    "release": "semantic-release"
+    "release": "semantic-release --extends devops/semantic-release.json",
+    "check": "bun run devops/check.ts"
   },
   "dependencies": {
     "@opentui/core": "^0.4.1",
@@ -45,5 +44,18 @@
     "react-doctor": "^0.5.6",
     "semantic-release": "^25.0.5",
     "typescript": "^6.0.3"
+  },
+  "reactDoctor": {
+    "ignore": {
+      "rules": [
+        "react-doctor/no-unknown-property",
+        "react-doctor/control-has-associated-label",
+        "react-doctor/async-parallel",
+        "react-doctor/async-await-in-loop",
+        "react-doctor/no-event-handler",
+        "deslop/unused-dev-dependency",
+        "react-doctor/prefer-useReducer"
+      ]
+    }
   }
 }

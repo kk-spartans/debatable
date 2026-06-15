@@ -29,7 +29,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          default = pkgs.callPackage ./package.nix { };
+          default = pkgs.callPackage ./devops/package.nix { };
         }
       );
 
@@ -39,24 +39,6 @@
           program = "${self.packages.${system}.default}/bin/debatable";
         };
       });
-
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          default = pkgs.mkShell {
-            packages = with pkgs; [
-              bun
-              codespell
-              nixfmt
-            ];
-          };
-        }
-      );
-
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
       homeManagerModules.default =
         {
@@ -69,7 +51,7 @@
           system = pkgs.stdenv.hostPlatform.system;
         in
         {
-          imports = [ ./flake-modules/home-manager.nix ];
+          imports = [ ./devops/home-manager.nix ];
 
           config.programs.debatable.package = lib.mkDefault self.packages.${system}.default;
         };

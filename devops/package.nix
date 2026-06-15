@@ -82,11 +82,11 @@ stdenv.mkDerivation {
     mkdir -p $out/share/nushell/completions
     mkdir -p $out/share/powershell/completions
 
-    usage g completion bash debatable -f debatable.usage.kdl > $out/share/bash-completion/completions/debatable
-    usage g completion zsh debatable -f debatable.usage.kdl > $out/share/zsh/site-functions/_debatable
-    usage g completion fish debatable -f debatable.usage.kdl > $out/share/fish/vendor_completions.d/debatable.fish
-    usage g completion nu debatable -f debatable.usage.kdl > $out/share/nushell/completions/debatable.nu
-    usage g completion powershell debatable -f debatable.usage.kdl > $out/share/powershell/completions/debatable.ps1
+    usage g completion bash debatable -f devops/usage.kdl > $out/share/bash-completion/completions/debatable
+    usage g completion zsh debatable -f devops/usage.kdl > $out/share/zsh/site-functions/_debatable
+    usage g completion fish debatable -f devops/usage.kdl > $out/share/fish/vendor_completions.d/debatable.fish
+    usage g completion nu debatable -f devops/usage.kdl > $out/share/nushell/completions/debatable.nu
+    usage g completion powershell debatable -f devops/usage.kdl > $out/share/powershell/completions/debatable.ps1
 
     runHook postInstall
   '';
