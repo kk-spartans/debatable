@@ -7,7 +7,7 @@
 }:
 
 let
-  pkg = builtins.fromJSON (builtins.readFile ./package.json);
+  pkg = builtins.fromJSON (builtins.readFile ../package.json);
 
   bunDeps = stdenv.mkDerivation {
     name = "${pkg.name}-bun-deps-${pkg.version}";
