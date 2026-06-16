@@ -12,7 +12,6 @@
         "zod": "^4.4.3",
       },
       "devDependencies": {
-        "@ai-sdk/gateway": "^3.0.131",
         "@e18e/cli": "^0.7.0",
         "@semantic-release/changelog": "^6.0.3",
         "@semantic-release/exec": "^7.1.0",

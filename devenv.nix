@@ -25,6 +25,8 @@
     typescript.enable = true;
   };
 
+  dotenv.enable = true;
+
   git-hooks.hooks.check = {
     enable = true;
     name = "check";
