@@ -33,7 +33,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Finder (MacOS) folder config
 .DS_Store
 
-debate*.md
+debatable*.md
 
 # Devenv
 .devenv*
