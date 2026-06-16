@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/kk-spartans/debatable/compare/v1.3.0...v1.3.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* **ci:** have seperate release script ([5da32e1](https://github.com/kk-spartans/debatable/commit/5da32e165a4112565c34c3061948560868eb93bd))
+
 # [1.3.0](https://github.com/kk-spartans/debatable/compare/v1.2.15...v1.3.0) (2026-06-16)
 
 ### Bug Fixes
