@@ -5,6 +5,21 @@
 
 * **ci:** substring syntax was broken ([6f89a3d](https://github.com/kk-spartans/debatable/commit/6f89a3d37ef7882b0e4eb1e3aa276d088cfcb909))
 * **docker:** yaml indentation failed compose ([28832cb](https://github.com/kk-spartans/debatable/commit/28832cbc14a348438b1ed1e20ce90c60d6f35706))
+* **nix:** imported wrong package.json ([a5becd9](https://github.com/kk-spartans/debatable/commit/a5becd961eb30dcf8c7a1a7929225271596abdf8))
+* use openrouter provider instead of vercel ai gateway ([9478358](https://github.com/kk-spartans/debatable/commit/9478358bb41e7042a7987d64fcdd1d6f93b0834b))
+
+
+### Features
+
+* add Docker setup with SearXNG, CI push to GHCR, SEARXNG_BASE_URL env var ([20dcc87](https://github.com/kk-spartans/debatable/commit/20dcc8707bc90741a7188f595cbe8cb60274996a))
+
+# [1.3.0](https://github.com/kk-spartans/debatable/compare/v1.2.15...v1.3.0) (2026-06-16)
+
+
+### Bug Fixes
+
+* **ci:** substring syntax was broken ([6f89a3d](https://github.com/kk-spartans/debatable/commit/6f89a3d37ef7882b0e4eb1e3aa276d088cfcb909))
+* **docker:** yaml indentation failed compose ([28832cb](https://github.com/kk-spartans/debatable/commit/28832cbc14a348438b1ed1e20ce90c60d6f35706))
 * use openrouter provider instead of vercel ai gateway ([9478358](https://github.com/kk-spartans/debatable/commit/9478358bb41e7042a7987d64fcdd1d6f93b0834b))
 
 
