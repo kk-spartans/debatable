@@ -47,36 +47,9 @@ jobs:
           fi
           echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Install platform native deps for all targets
-        if: steps.check.outputs.version != ''
-        run: |
-          bun install --frozen-lockfile --no-verify --cpu arm64 --os linux
-          bun install --frozen-lockfile --no-verify --cpu x64 --os darwin
-          bun install --frozen-lockfile --no-verify --cpu arm64 --os darwin
-          bun install --frozen-lockfile --no-verify --cpu x64 --os win32
-          bun install --frozen-lockfile --no-verify --cpu arm64 --os win32
-
       - name: Build and upload release artifacts
         if: steps.check.outputs.version != ''
-        run: |
-          TAG="v${{ steps.check.outputs.version }}"
-          echo "Building release artifacts for $TAG"
-
-          mkdir -p artifacts
-
-          for plat in linux-x64 linux-arm64 darwin-x64 darwin-arm64; do
-            bun build --compile --outfile "artifacts/debatable" --target "bun-$plat" src/index.tsx
-            (cd artifacts && zip -r "../debatable-$plat.zip" debatable)
-            rm artifacts/debatable
-          done
-
-          for plat in windows-x64 windows-arm64; do
-            bun build --compile --outfile "artifacts/debatable.exe" --target "bun-$plat" src/index.tsx
-            (cd artifacts && zip -r "../debatable-$plat.zip" debatable.exe)
-            rm artifacts/debatable.exe
-          done
-
-          gh release upload "$TAG" debatable-*.zip --clobber
+        run: devenv tasks run debatable:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -39,5 +39,6 @@
     "debatable:check".exec = "bun run check";
     "debatable:start".exec = "bun run start";
     "debatable:release".exec = "bun run release";
+    "debatable:publish".exec = "bun run devops/publish.ts";
   };
 }
