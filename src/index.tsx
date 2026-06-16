@@ -20,7 +20,7 @@ Options:
   -r, --rounds <n>         Number of debate rounds (default: 3)
   -m, --min-searches <n>   Minimum searches per turn (default: 1)
   -k, --api-key <key>      Set API key (overrides OPENROUTER_API_KEY)
-  --model <model>          Default model for all sides (e.g. openrouter/anthropic/claude-sonnet-4-20250514)
+  --model <model>          Default model for all sides (e.g. anthropic/claude-sonnet-4-20250514)
   --pro-model <model>      Override model for the PRO side
   --con-model <model>      Override model for the NEG side
   --judge-model <model>    Override model for judging and feedback
@@ -36,8 +36,8 @@ Examples:
   debatable "Migration increases unemployment"
   debatable -r 2 "AI will replace most jobs" --headless
   debatable -k sk-or-v1-xxx "Universal Basic Income" -o debate.md --headless
-  debatable --model openrouter/anthropic/claude-sonnet-4-20250514 "UBI" --headless
-  debatable --model openrouter/google/gemini-2.0-flash-001 --pro-model openrouter/anthropic/claude-sonnet-4-20250514 "AI safety" --headless`);
+  debatable --model anthropic/claude-sonnet-4-20250514 "UBI" --headless
+  debatable --model google/gemini-2.0-flash-001 --pro-model anthropic/claude-sonnet-4-20250514 "AI safety" --headless`);
 }
 
 const helpFlag = args.includes("--help") || args.includes("-h");

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { streamText, tool } from "ai";
-import { createGateway } from "@ai-sdk/gateway";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { z } from "zod";
 import { webSearch } from "./search.ts";
 import type { DebateConfig, DebateResult } from "./debate.ts";
@@ -54,8 +54,8 @@ async function speak(
 ): Promise<string> {
   const modelId =
     side === "pro" ? (config.proModel ?? config.model) : (config.conModel ?? config.model);
-  const gateway = createGateway({ apiKey: config.apiKey });
-  const lm = gateway.languageModel(modelId);
+  const or = createOpenRouter({ apiKey: config.apiKey });
+  const lm = or.chat(modelId.replace(/^openrouter\//, ""));
   const messages: ModelMessage[] = [...sideMessages];
 
   const lastOpponentMsg = [...opponentHistory]
@@ -152,8 +152,8 @@ async function generateFeedback(
   onFeedback?: (text: string) => void,
 ): Promise<string> {
   const modelId = config.judgeModel ?? config.model;
-  const gateway = createGateway({ apiKey: config.apiKey });
-  const lm = gateway.languageModel(modelId);
+  const or = createOpenRouter({ apiKey: config.apiKey });
+  const lm = or.chat(modelId.replace(/^openrouter\//, ""));
   const targetSide = forSide === "pro" ? "NEG" : "PRO";
 
   let streamResult;
@@ -196,8 +196,8 @@ async function judge(
   onJudgeResult?: (winner: string, reasoning: string) => void,
 ): Promise<{ winner: string; reasoning: string }> {
   const modelId = config.judgeModel ?? config.model;
-  const gateway = createGateway({ apiKey: config.apiKey });
-  const lm = gateway.languageModel(modelId);
+  const or = createOpenRouter({ apiKey: config.apiKey });
+  const lm = or.chat(modelId.replace(/^openrouter\//, ""));
 
   let streamResult;
   try {

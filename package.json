@@ -20,13 +20,13 @@
     "check": "bun run devops/check.ts"
   },
   "dependencies": {
+    "@openrouter/ai-sdk-provider": "^2.9.1",
     "@opentui/core": "^0.4.1",
     "@opentui/react": "^0.4.1",
     "react": "^19.2.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@ai-sdk/gateway": "^3.0.131",
     "@e18e/cli": "^0.7.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/exec": "^7.1.0",
