@@ -11,7 +11,7 @@ let
 
   bunDeps = stdenv.mkDerivation {
     name = "${pkg.name}-bun-deps-${pkg.version}";
-    src = lib.sourceByRegex ./. [ "^package\\.json$" "^bun\\.lock$" ];
+    src = lib.sourceByRegex ../. [ "^package\\.json$" "^bun\\.lock$" ];
     nativeBuildInputs = [ bun ];
     buildInputs = [ cacert ];
     dontFixup = true;
@@ -34,9 +34,9 @@ in
 stdenv.mkDerivation {
   inherit (pkg) name version;
 
-  src = lib.cleanSourceWith {
-    src = ./.;
-    filter =
+    src = lib.cleanSourceWith {
+      src = ../.;
+      filter =
       name: type:
       let
         baseName = baseNameOf (toString name);
