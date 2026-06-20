@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/kk-spartans/debatable/compare/v1.3.1...v1.3.2) (2026-06-20)
+
+
+### Bug Fixes
+
+* **nix:** package,json and src directory resolve to repo root ([da62993](https://github.com/kk-spartans/debatable/commit/da6299377b799e1caf3023660eac4053906f88e3))
+
 ## [1.3.1](https://github.com/kk-spartans/debatable/compare/v1.3.0...v1.3.1) (2026-06-16)
 
 
