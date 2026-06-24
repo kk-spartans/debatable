@@ -13,7 +13,7 @@
         {
           "image": "ghcr.io/kk-spartans/debatable/debatable-app:latest",
           "depends_on": ["searxng"],
-          "env_file": ["../.env"],
+          "env_file": ["./.env"],
           "environment": { "SEARXNG_BASE_URL": "http://searxng:8080" },
           "stdin_open": true,
           "tty": true,
