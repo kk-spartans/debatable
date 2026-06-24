@@ -7,10 +7,9 @@
 
 ## [1.3.3](https://github.com/kk-spartans/debatable/compare/v1.3.2...v1.3.3) (2026-06-24)
 
-
 ### Bug Fixes
 
-* throttle text rendering to prevent terminal twitching; fix CAI SDK system message warning ([4e1213f](https://github.com/kk-spartans/debatable/commit/4e1213f2267cfb31457447c33e72186c6afaba1b))
+- throttle text rendering to prevent terminal twitching; fix CAI SDK system message warning ([4e1213f](https://github.com/kk-spartans/debatable/commit/4e1213f2267cfb31457447c33e72186c6afaba1b))
 
 ## [1.3.2](https://github.com/kk-spartans/debatable/compare/v1.3.1...v1.3.2) (2026-06-20)
 

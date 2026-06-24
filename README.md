@@ -9,6 +9,7 @@ mkdir debatable
 cd debatable
 curl https://raw.githubusercontent.com/kk-spartans/debatable/refs/heads/main/devops/docker-compose.yml > docker-compose.yml
 curl https://raw.githubusercontent.com/kk-spartans/debatable/refs/heads/main/devops/settings.yml > settings.yml
+echo "OPENROUTER_API_KEY=xxx" > .env
 docker compose run --rm -d searxng
 docker compose run --rm debatable
 ```
@@ -16,6 +17,7 @@ docker compose run --rm debatable
 nix:
 
 ```
+# make sure to set the OPENROUTER_API_KEY env var
 nix run github:kk-spartans/debatable --no-write-lock-file --searxng-url "http://localhost:8080"
 ```
 
