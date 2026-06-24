@@ -44,6 +44,7 @@ type DebateSide = "pro" | "con";
 
 async function speak(
   config: DebateConfig,
+  systemContent: string,
   sideMessages: ModelMessage[],
   opponentHistory: ModelMessage[],
   side: DebateSide,
@@ -82,6 +83,8 @@ async function speak(
   const tools = { web_search: webSearchTool };
   let searchCount = 0;
   let fullContent = "";
+  let emptyRetries = 0;
+  const maxEmptyRetries = 3;
 
   while (true) {
     const needSearches = searchCount < config.minSearches;
@@ -89,7 +92,7 @@ async function speak(
 
     let streamResult;
     try {
-      streamResult = streamText({ model: lm, messages, tools, toolChoice });
+      streamResult = streamText({ model: lm, system: systemContent, messages, tools, toolChoice });
     } catch (e) {
       throw new DebateError(
         `Failed to start stream: ${e instanceof Error ? e.message : String(e)}`,
@@ -135,10 +138,21 @@ async function speak(
       continue;
     }
 
-    if (content) {
-      fullContent += content;
-      if (!content.endsWith("\n")) fullContent += "\n";
+    if (!content) {
+      emptyRetries++;
+      if (emptyRetries >= maxEmptyRetries) {
+        fullContent = "[No arguments presented]";
+        break;
+      }
+      messages.push({
+        role: "user",
+        content: "You must present your arguments now. Write a substantive argument for your side.",
+      });
+      continue;
     }
+
+    fullContent += content;
+    if (!content.endsWith("\n")) fullContent += "\n";
     break;
   }
 
@@ -160,12 +174,9 @@ async function generateFeedback(
   try {
     streamResult = streamText({
       model: lm,
+      system:
+        "You are a helpful debate coach. Provide constructive, specific feedback focused on argumentation, evidence use, and persuasion. Do not use any tools.",
       messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful debate coach. Provide constructive, specific feedback focused on argumentation, evidence use, and persuasion. Do not use any tools.",
-        },
         {
           role: "user",
           content: `Review the ${targetSide} debater's arguments below and provide constructive feedback on how they could improve. Be specific about argumentation, evidence use, and persuasion.\n\n${targetSide}'s arguments:\n${allRounds.join("\n\n")}`,
@@ -203,12 +214,9 @@ async function judge(
   try {
     streamResult = streamText({
       model: lm,
+      system:
+        "You are an impartial debate judge. Evaluate the debate based on evidence, logic, persuasiveness, and rebuttals. Pick a clear winner and provide detailed reasoning.",
       messages: [
-        {
-          role: "system",
-          content:
-            "You are an impartial debate judge. Evaluate the debate based on evidence, logic, persuasiveness, and rebuttals. Pick a clear winner and provide detailed reasoning.",
-        },
         {
           role: "user",
           content: `Debate topic: "${config.topic}"\n\nPRO arguments:\n${proRounds.join("\n\n")}\n\nNEG arguments:\n${conRounds.join("\n\n")}\n\nWho won this debate? Start your response with "PRO" or "NEG" on the first line, followed by your detailed reasoning.`,
@@ -237,17 +245,11 @@ async function runDebateInternal(
   config: DebateConfig,
   callbacks?: DebateCallbacks,
 ): Promise<DebateResult> {
-  const proSystem: ModelMessage = {
-    role: "system",
-    content: `You are arguing FOR the proposition: "${config.topic}". Defend it with evidence, logic, and persuasive arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(config.minSearches, 1)} time(s). Do not mention being an AI or language model.`,
-  };
-  const conSystem: ModelMessage = {
-    role: "system",
-    content: `You are arguing AGAINST the proposition: "${config.topic}". Refute it with evidence, logic, and persuasive counter-arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(config.minSearches, 1)} time(s). Do not mention being an AI or language model.`,
-  };
+  const proSystemContent = `You are arguing FOR the proposition: "${config.topic}". Defend it with evidence, logic, and persuasive arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(config.minSearches, 1)} time(s). Do not mention being an AI or language model.`;
+  const conSystemContent = `You are arguing AGAINST the proposition: "${config.topic}". Refute it with evidence, logic, and persuasive counter-arguments. You MUST use the web_search tool before every response to gather current evidence. Search at least ${Math.max(config.minSearches, 1)} time(s). Do not mention being an AI or language model.`;
 
-  const proHistory: ModelMessage[] = [proSystem];
-  const conHistory: ModelMessage[] = [conSystem];
+  const proHistory: ModelMessage[] = [];
+  const conHistory: ModelMessage[] = [];
   const proRounds: string[] = [];
   const conRounds: string[] = [];
 
@@ -259,6 +261,7 @@ async function runDebateInternal(
 
     const proResult = await speak(
       config,
+      proSystemContent,
       proHistory,
       conHistory,
       "pro",
@@ -274,6 +277,7 @@ async function runDebateInternal(
       callbacks?.onStatus?.(`Round ${round}/${config.rounds} - NEG speaking`);
       const conResult = await speak(
         config,
+        conSystemContent,
         conHistory,
         proHistory,
         "con",

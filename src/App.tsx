@@ -7,6 +7,13 @@ import { writeMarkdown } from "./lib/write-markdown.ts";
 import type { DebateResult, AppPhase } from "./lib/debate.ts";
 import type { Theme } from "./lib/theme.ts";
 
+const FLUSH_INTERVAL = 30;
+
+interface TextBatch {
+  text: string;
+  roundIdx: number;
+}
+
 interface AppProps {
   initialTopic?: string;
   initialRounds?: number;
@@ -428,6 +435,54 @@ export function App({ initialTopic, initialModel, theme: _theme }: AppProps) {
     null,
   );
 
+  const proTextBuffer = useRef<TextBatch[]>([]);
+  const conTextBuffer = useRef<TextBatch[]>([]);
+  const flushScheduled = useRef(false);
+  const lastFlushTime = useRef(0);
+
+  const flushTextBuffers = useCallback(() => {
+    flushScheduled.current = false;
+    lastFlushTime.current = Date.now();
+
+    const proBatch = proTextBuffer.current;
+    proTextBuffer.current = [];
+    if (proBatch.length > 0) {
+      setProRounds((prev) => {
+        let c = prev;
+        for (const { text, roundIdx } of proBatch) {
+          c = appendTextSegment(c, roundIdx, text);
+        }
+        return c;
+      });
+    }
+
+    const conBatch = conTextBuffer.current;
+    conTextBuffer.current = [];
+    if (conBatch.length > 0) {
+      setConRounds((prev) => {
+        let c = prev;
+        for (const { text, roundIdx } of conBatch) {
+          c = appendTextSegment(c, roundIdx, text);
+        }
+        return c;
+      });
+    }
+  }, []);
+
+  const scheduleFlush = useCallback(() => {
+    const now = Date.now();
+    const elapsed = now - lastFlushTime.current;
+    if (elapsed >= FLUSH_INTERVAL) {
+      flushTextBuffers();
+    } else if (!flushScheduled.current) {
+      flushScheduled.current = true;
+      setTimeout(() => {
+        flushScheduled.current = false;
+        flushTextBuffers();
+      }, FLUSH_INTERVAL - elapsed);
+    }
+  }, [flushTextBuffers]);
+
   const syntaxStyle = useMemo(() => SyntaxStyle.create(), []);
 
   const exitGuard = useRef(false);
@@ -466,6 +521,15 @@ export function App({ initialTopic, initialModel, theme: _theme }: AppProps) {
       startDebateRef.current();
     }
   }, [initialTopic, phase]);
+
+  useEffect(() => {
+    if (phase !== "debating") {
+      flushTextBuffers();
+    }
+    return () => {
+      flushTextBuffers();
+    };
+  }, [phase, flushTextBuffers]);
 
   useKeyboard(
     useCallback(
@@ -545,14 +609,12 @@ export function App({ initialTopic, initialModel, theme: _theme }: AppProps) {
             }
           },
           onProText: (t) => {
-            setProRounds((prev) =>
-              appendTextSegment(prev, Math.max(0, currentRoundIdx.current), t),
-            );
+            proTextBuffer.current.push({ text: t, roundIdx: Math.max(0, currentRoundIdx.current) });
+            scheduleFlush();
           },
           onConText: (t) => {
-            setConRounds((prev) =>
-              appendTextSegment(prev, Math.max(0, currentRoundIdx.current), t),
-            );
+            conTextBuffer.current.push({ text: t, roundIdx: Math.max(0, currentRoundIdx.current) });
+            scheduleFlush();
           },
           onProSearch: (query) => {
             if (shownSearchesPro.current!.has(query)) return;
@@ -590,7 +652,17 @@ export function App({ initialTopic, initialModel, theme: _theme }: AppProps) {
     } catch (e: unknown) {
       console.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
     }
-  }, [topic, roundsStr, minSearchesStr, apiKey, model, proModel, conModel, judgeModel]);
+  }, [
+    topic,
+    roundsStr,
+    minSearchesStr,
+    apiKey,
+    model,
+    proModel,
+    conModel,
+    judgeModel,
+    scheduleFlush,
+  ]);
 
   startDebateRef.current = startDebate;
 
