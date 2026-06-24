@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/kk-spartans/debatable/compare/v1.3.4...v1.4.0) (2026-06-24)
+
+
+### Features
+
+* add version flag ([2830eee](https://github.com/kk-spartans/debatable/commit/2830eee13252b62ec33f3e5fdfa9009467f135dc))
+
 ## [1.3.4](https://github.com/kk-spartans/debatable/compare/v1.3.3...v1.3.4) (2026-06-24)
 
 ### Bug Fixes
