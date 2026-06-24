@@ -7,17 +7,15 @@
 
 ## [1.3.2](https://github.com/kk-spartans/debatable/compare/v1.3.1...v1.3.2) (2026-06-20)
 
-
 ### Bug Fixes
 
-* **nix:** package,json and src directory resolve to repo root ([da62993](https://github.com/kk-spartans/debatable/commit/da6299377b799e1caf3023660eac4053906f88e3))
+- **nix:** package,json and src directory resolve to repo root ([da62993](https://github.com/kk-spartans/debatable/commit/da6299377b799e1caf3023660eac4053906f88e3))
 
 ## [1.3.1](https://github.com/kk-spartans/debatable/compare/v1.3.0...v1.3.1) (2026-06-16)
 
-
 ### Bug Fixes
 
-* **ci:** have seperate release script ([5da32e1](https://github.com/kk-spartans/debatable/commit/5da32e165a4112565c34c3061948560868eb93bd))
+- **ci:** have seperate release script ([5da32e1](https://github.com/kk-spartans/debatable/commit/5da32e165a4112565c34c3061948560868eb93bd))
 
 # [1.3.0](https://github.com/kk-spartans/debatable/compare/v1.2.15...v1.3.0) (2026-06-16)
 

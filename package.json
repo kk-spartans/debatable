@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "^2.9.1",
-    "@opentui/core": "^0.4.1",
-    "@opentui/react": "^0.4.1",
+    "@opentui/core": "^0.4.2",
+    "@opentui/react": "^0.4.2",
     "react": "^19.2.7",
     "zod": "^4.4.3"
   },

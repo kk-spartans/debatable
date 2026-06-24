@@ -19,7 +19,7 @@ let
     dontStrip = true;
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
-    outputHash = "sha256-tkdwzDFiGYJD+zaUB8eoYD72qiW117N/bWoFWJRylB0=";
+    outputHash = "sha256-55CI7cMFydfDpObXQrPzqJXrLS6PgAbR1I9guew3cug=";
     buildPhase = ''
       export HOME=$TMPDIR
       export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt

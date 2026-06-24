@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { Fragment, useState, useRef, useCallback, useEffect } from "react";
+import type { ReactNode } from "react";
 import { useKeyboard, useRenderer } from "@opentui/react";
-import { SyntaxStyle } from "@opentui/core";
 import { Effect } from "effect";
 import { runDebate } from "./lib/run-debate.ts";
 import { writeMarkdown } from "./lib/write-markdown.ts";
@@ -28,6 +28,78 @@ function nextSegId(): string {
 }
 
 type Seg = { t: "text"; v: string; _id: string } | { t: "search"; v: string; _id: string };
+
+interface MarkdownTextProps {
+  content: string;
+  theme: Theme;
+}
+
+function renderInlineMarkdown(text: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let i = 0;
+  let key = 0;
+
+  while (i < text.length) {
+    const boldStart = text.indexOf("**", i);
+    const italicStart = text.indexOf("*", i);
+    const nextStart = [boldStart, italicStart].filter((idx) => idx >= 0).sort((a, b) => a - b)[0];
+
+    if (nextStart === undefined) {
+      nodes.push(text.slice(i));
+      break;
+    }
+
+    if (nextStart > i) {
+      nodes.push(text.slice(i, nextStart));
+    }
+
+    if (text.startsWith("**", nextStart)) {
+      const end = text.indexOf("**", nextStart + 2);
+      if (end === -1) {
+        nodes.push(text.slice(nextStart));
+        break;
+      }
+      nodes.push(<strong key={`b-${key++}`}>{text.slice(nextStart + 2, end)}</strong>);
+      i = end + 2;
+      continue;
+    }
+
+    const end = text.indexOf("*", nextStart + 1);
+    if (end === -1) {
+      nodes.push(text.slice(nextStart));
+      break;
+    }
+    nodes.push(<em key={`i-${key++}`}>{text.slice(nextStart + 1, end)}</em>);
+    i = end + 1;
+  }
+
+  return nodes;
+}
+
+function MarkdownText({ content, theme }: MarkdownTextProps) {
+  const lines = content.trim().split("\n");
+
+  return (
+    <box flexDirection="column">
+      {lines.map((line, idx) => {
+        const heading = /^(#{1,6})\s+(.+)$/.exec(line);
+        if (heading) {
+          return (
+            <text key={idx} fg={theme.accent}>
+              <strong>{renderInlineMarkdown(heading[2]!)}</strong>
+            </text>
+          );
+        }
+
+        return (
+          <text key={idx} fg={theme.text}>
+            {renderInlineMarkdown(line)}
+          </text>
+        );
+      })}
+    </box>
+  );
+}
 
 function appendTextSegment(rounds: Seg[][], idx: number, text: string): Seg[][] {
   const next = rounds.map((r) => [...r]);
@@ -115,6 +187,7 @@ function SetupForm({
         <box marginTop={1} flexDirection="column">
           <text>Debate Topic</text>
           <input
+            aria-label="Debate Topic"
             value={topic}
             placeholder="e.g. Migration increases unemployment"
             focused={focusIndex === 0}
@@ -125,6 +198,7 @@ function SetupForm({
         <box marginTop={1} flexDirection="column">
           <text>Number of Rounds</text>
           <input
+            aria-label="Number of Rounds"
             value={roundsStr}
             placeholder="3"
             focused={focusIndex === 1}
@@ -135,6 +209,7 @@ function SetupForm({
         <box marginTop={1} flexDirection="column">
           <text>Min Searches Per Turn</text>
           <input
+            aria-label="Min Searches Per Turn"
             value={minSearchesStr}
             placeholder="1"
             focused={focusIndex === 2}
@@ -145,6 +220,7 @@ function SetupForm({
         <box marginTop={1} flexDirection="column">
           <text>Model</text>
           <input
+            aria-label="Model"
             value={model}
             placeholder="openrouter/..."
             focused={focusIndex === 3}
@@ -155,6 +231,7 @@ function SetupForm({
         <box marginTop={1} flexDirection="column">
           <text>PRO Model (override)</text>
           <input
+            aria-label="PRO Model override"
             value={proModel}
             placeholder="Same as Model if empty"
             focused={focusIndex === 4}
@@ -165,6 +242,7 @@ function SetupForm({
         <box marginTop={1} flexDirection="column">
           <text>NEG Model (override)</text>
           <input
+            aria-label="NEG Model override"
             value={conModel}
             placeholder="Same as Model if empty"
             focused={focusIndex === 5}
@@ -175,6 +253,7 @@ function SetupForm({
         <box marginTop={1} flexDirection="column">
           <text>Judge Model (override)</text>
           <input
+            aria-label="Judge Model override"
             value={judgeModel}
             placeholder="Same as Model if empty"
             focused={focusIndex === 6}
@@ -197,11 +276,10 @@ function SetupForm({
 
 interface JudgeResultModalProps {
   judgeResult: { winner: string; reasoning: string };
-  syntaxStyle: SyntaxStyle;
   theme: Theme;
 }
 
-function JudgeResultModal({ judgeResult, syntaxStyle, theme }: JudgeResultModalProps) {
+function JudgeResultModal({ judgeResult, theme }: JudgeResultModalProps) {
   return (
     <box
       position="absolute"
@@ -240,12 +318,7 @@ function JudgeResultModal({ judgeResult, syntaxStyle, theme }: JudgeResultModalP
           paddingX={1}
           paddingTop={1}
         >
-          <markdown
-            syntaxStyle={syntaxStyle}
-            fg={theme.text}
-            content={judgeResult.reasoning}
-            streaming={false}
-          />
+          <MarkdownText content={judgeResult.reasoning} theme={theme} />
         </scrollbox>
         <box marginTop={1}>
           <text fg={theme.subtext}>Press ESC to exit</text>
@@ -257,23 +330,19 @@ function JudgeResultModal({ judgeResult, syntaxStyle, theme }: JudgeResultModalP
 
 interface DebatePanelsProps {
   topic: string;
-  phase: AppPhase;
   proRounds: Seg[][];
   conRounds: Seg[][];
   proFeedback: string;
   conFeedback: string;
-  syntaxStyle: SyntaxStyle;
   theme: Theme;
 }
 
 function DebatePanels({
   topic,
-  phase,
   proRounds,
   conRounds,
   proFeedback,
   conFeedback,
-  syntaxStyle,
   theme,
 }: DebatePanelsProps) {
   return (
@@ -282,6 +351,7 @@ function DebatePanels({
         key="pro"
         borderStyle="rounded"
         borderColor={theme.pro}
+        focusedBorderColor={theme.pro}
         title={`PRO: That ${topic}`}
         flexGrow={1}
         stickyScroll
@@ -290,22 +360,11 @@ function DebatePanels({
         paddingX={2}
         paddingTop={1}
       >
-        <DebateRounds
-          rounds={proRounds}
-          side="pro"
-          syntaxStyle={syntaxStyle}
-          phase={phase}
-          theme={theme}
-        />
+        <DebateRounds rounds={proRounds} side="pro" theme={theme} />
         {proFeedback && (
           <box flexDirection="column" padding={1}>
             <text>{"\n"}</text>
-            <markdown
-              syntaxStyle={syntaxStyle}
-              fg={theme.text}
-              content={proFeedback}
-              streaming={false}
-            />
+            <MarkdownText content={proFeedback} theme={theme} />
           </box>
         )}
       </scrollbox>
@@ -313,6 +372,7 @@ function DebatePanels({
         key="con"
         borderStyle="rounded"
         borderColor={theme.con}
+        focusedBorderColor={theme.con}
         title={`NEG: Not that ${topic}`}
         flexGrow={1}
         stickyScroll
@@ -321,22 +381,11 @@ function DebatePanels({
         paddingX={2}
         paddingTop={1}
       >
-        <DebateRounds
-          rounds={conRounds}
-          side="con"
-          syntaxStyle={syntaxStyle}
-          phase={phase}
-          theme={theme}
-        />
+        <DebateRounds rounds={conRounds} side="con" theme={theme} />
         {conFeedback && (
           <box flexDirection="column" padding={1}>
             <text>{"\n"}</text>
-            <markdown
-              syntaxStyle={syntaxStyle}
-              fg={theme.text}
-              content={conFeedback}
-              streaming={false}
-            />
+            <MarkdownText content={conFeedback} theme={theme} />
           </box>
         )}
       </scrollbox>
@@ -347,8 +396,6 @@ function DebatePanels({
 interface DebateRoundsProps {
   rounds: Seg[][];
   side: "pro" | "con";
-  syntaxStyle: SyntaxStyle;
-  phase: AppPhase;
   theme: Theme;
 }
 
@@ -357,7 +404,7 @@ function nextRoundId(): string {
   return `r-${++_roundId}`;
 }
 
-function DebateRounds({ rounds, side, syntaxStyle, phase, theme }: DebateRoundsProps) {
+function DebateRounds({ rounds, side, theme }: DebateRoundsProps) {
   const accent = side === "pro" ? theme.pro : theme.con;
   const name = side === "pro" ? "PRO" : "NEG";
 
@@ -381,15 +428,10 @@ function DebateRounds({ rounds, side, syntaxStyle, phase, theme }: DebateRoundsP
                 <br />
               </text>
             ) : (
-              <>
-                <markdown
-                  key={seg._id}
-                  syntaxStyle={syntaxStyle}
-                  content={seg.v}
-                  streaming={phase === "debating"}
-                />
+              <Fragment key={seg._id}>
+                <MarkdownText content={seg.v} theme={theme} />
                 <text>{"\n"}</text>
-              </>
+              </Fragment>
             ),
           )
         ) : (
@@ -482,8 +524,6 @@ export function App({ initialTopic, initialModel, theme: _theme }: AppProps) {
       }, FLUSH_INTERVAL - elapsed);
     }
   }, [flushTextBuffers]);
-
-  const syntaxStyle = useMemo(() => SyntaxStyle.create(), []);
 
   const exitGuard = useRef(false);
   const debateRef = useRef<DebateResult | null>(null);
@@ -710,13 +750,12 @@ export function App({ initialTopic, initialModel, theme: _theme }: AppProps) {
           conRounds={conRounds}
           proFeedback={proFeedback}
           conFeedback={conFeedback}
-          syntaxStyle={syntaxStyle}
           theme={theme}
         />
       )}
 
       {phase === "done" && judgeResult && (
-        <JudgeResultModal judgeResult={judgeResult} syntaxStyle={syntaxStyle} theme={theme} />
+        <JudgeResultModal judgeResult={judgeResult} theme={theme} />
       )}
     </box>
   );
