@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/kk-spartans/debatable/compare/v1.4.0...v1.4.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* docker-compose.yml points to ../.env ([f921881](https://github.com/kk-spartans/debatable/commit/f921881dcecd1d330dbe0ee9a04c212a407866f7))
+
 # [1.4.0](https://github.com/kk-spartans/debatable/compare/v1.3.4...v1.4.0) (2026-06-24)
 
 
