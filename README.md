@@ -1,6 +1,6 @@
 # debatable
 
-**I don't have any more ideas for this. If you have something you want to add, please open an issue, or make a PR. It does not have to be properly formatted, or well thought out (I've seena lot of friction here).**
+**I don't have any more ideas for this. If you have something you want to add, please open an issue, or make a PR. It does not have to be properly formatted, or well thought out (I've seen a lot of friction here).**
 
 docker:
 
