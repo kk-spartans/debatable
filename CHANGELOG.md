@@ -1,9 +1,8 @@
 ## [1.3.4](https://github.com/kk-spartans/debatable/compare/v1.3.3...v1.3.4) (2026-06-24)
 
-
 ### Bug Fixes
 
-* markdown rendering flicker ([d27b941](https://github.com/kk-spartans/debatable/commit/d27b941b507aefed7b86f6b89dcefdba0f863f6e))
+- markdown rendering flicker ([d27b941](https://github.com/kk-spartans/debatable/commit/d27b941b507aefed7b86f6b89dcefdba0f863f6e))
 
 ## [1.3.3](https://github.com/kk-spartans/debatable/compare/v1.3.2...v1.3.3) (2026-06-24)
 

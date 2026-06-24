@@ -14,6 +14,7 @@ flag "--searxng-url <url>" help="Base URL for SearXNG instance"
 flag "-o --output <path>" help="Output markdown file path"
 flag "--headless" help="Run in headless mode (no TUI)"
 flag "--completions <shell>" help="Print shell completions and exit"
+flag "--version" help="Show version number and exit"
 flag "-h --help" help="Show this help message and exit"
 
 arg "[topic]" help="Debate topic"

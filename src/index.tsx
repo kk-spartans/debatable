@@ -8,6 +8,9 @@ import { setSearxngUrl } from "./lib/search.ts";
 import { readTheme } from "./lib/config.ts";
 import type { DebateConfig } from "./lib/debate.ts";
 
+declare const DEBATABLE_VERSION: string;
+
+const version = typeof DEBATABLE_VERSION === "string" ? DEBATABLE_VERSION : "dev";
 const args = process.argv.slice(2);
 
 function printHelp(): void {
@@ -28,6 +31,7 @@ Options:
   -o, --output <path>      Output markdown file path
   --headless               Run in headless mode (no TUI)
   --completions <shell>    Print shell completions (bash, zsh, fish, powershell, nushell)
+  --version                Show version number and exit
   -h, --help               Show this help message and exit
 
 Headless mode requires both a topic and an API key (--api-key or OPENROUTER_API_KEY).
@@ -43,6 +47,11 @@ Examples:
 const helpFlag = args.includes("--help") || args.includes("-h");
 if (helpFlag) {
   printHelp();
+  process.exit(0);
+}
+
+if (args.includes("--version")) {
+  console.log(version);
   process.exit(0);
 }
 

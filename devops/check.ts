@@ -1,11 +1,14 @@
 import { $ } from "bun";
+import { readFileSync } from "node:fs";
+
+const { version } = JSON.parse(readFileSync("package.json", "utf-8"));
 
 const steps = [
   async () => {
     await $`gitleaks protect --staged --redact --verbose`;
   },
   async () => {
-    await $`bun build --compile --outfile dist/debatable src/index.tsx`;
+    await $`bun build --compile --outfile dist/debatable --define DEBATABLE_VERSION=${JSON.stringify(version)} src/index.tsx`;
   },
   async () => {
     await $`oxlint --type-aware --fix --config devops/oxlintrc.json --tsconfig devops/tsconfig.json`;

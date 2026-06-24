@@ -30,7 +30,7 @@ for (const { cpu, os } of nativePlats) {
 await $`mkdir -p artifacts`;
 
 for (const { target, suffix, ext } of platforms) {
-  await $`bun build --compile --outfile artifacts/debatable${ext} --target ${target} src/index.tsx`;
+  await $`bun build --compile --outfile artifacts/debatable${ext} --target ${target} --define DEBATABLE_VERSION=${JSON.stringify(version)} src/index.tsx`;
   await $`zip -j debatable-${suffix}.zip artifacts/debatable${ext}`;
   await $`rm artifacts/debatable${ext}`;
 }
