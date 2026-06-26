@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/kk-spartans/debatable/compare/v1.4.1...v1.4.2) (2026-06-26)
+
+
+### Performance Improvements
+
+* install only production deps in docker image ([36e4ad2](https://github.com/kk-spartans/debatable/commit/36e4ad2febf412027522e97e576d89d2158afe2d))
+
 ## [1.4.1](https://github.com/kk-spartans/debatable/compare/v1.4.0...v1.4.1) (2026-06-24)
 
 
