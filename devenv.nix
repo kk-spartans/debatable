@@ -12,6 +12,7 @@
     gitleaks
     usage
     nixfmt
+    docker
   ];
 
   languages = {
