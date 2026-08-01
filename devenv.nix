@@ -13,6 +13,8 @@
     usage
     nixfmt
     docker
+    arion
+    docker-compose
   ];
 
   languages = {
@@ -41,5 +43,7 @@
     "debatable:start".exec = "bun run start";
     "debatable:release".exec = "bun run release";
     "debatable:publish".exec = "bun run devops/publish.ts";
+    "debatable:compose".exec =
+      "arion -f devops/arion-compose.nix -p devops/arion-pkgs.nix run --rm debatable";
   };
 }

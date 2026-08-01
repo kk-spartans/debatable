@@ -23,6 +23,8 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems f;
     in
     {
+      legacyPackages = forAllSystems (system: nixpkgs.legacyPackages.${system});
+
       packages = forAllSystems (
         system:
         let
@@ -30,6 +32,9 @@
         in
         {
           default = pkgs.callPackage ./devops/package.nix { };
+          docker = pkgs.callPackage ./devops/docker.nix {
+            debatable = self.packages.${system}.default;
+          };
         }
       );
 

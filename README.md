@@ -27,6 +27,36 @@ npm:
 bunx debatable --searxng-url "http://localhost:8080"
 ```
 
+## Development
+
+Requires [devenv](https://devenv.sh), [Nix](https://nixos.org), and Docker.
+
+```bash
+git clone https://github.com/kk-spartans/debatable
+cd debatable
+devenv shell
+```
+
+Create `.env`, then run:
+
+```bash
+cp .env.example .env   # then edit OPENROUTER_API_KEY
+devenv tasks run debatable:compose
+```
+
+or directly:
+
+```bash
+arion -f devops/arion-compose.nix -p devops/arion-pkgs.nix run --rm debatable
+```
+
+## Building the Docker image
+
+```bash
+nix build .#docker
+docker load < result
+```
+
 ## Home Manager Module
 
 _i was bored_
